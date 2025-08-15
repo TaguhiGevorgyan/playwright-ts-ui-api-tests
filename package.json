@@ -8,7 +8,25 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "@playwright/test": "^1.54.1",
+    "@playwright/test": "^1.54.2",
     "@types/node": "^24.0.14"
-  }
+  },
+  "directories": {
+    "test": "tests"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "fsevents": "^2.3.2",
+    "playwright": "^1.54.1",
+    "playwright-core": "^1.54.1",
+    "undici-types": "^7.8.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TaguhiGevorgyan/playwright_tests.git"
+  },
+  "bugs": {
+    "url": "https://github.com/TaguhiGevorgyan/playwright_tests/issues"
+  },
+  "homepage": "https://github.com/TaguhiGevorgyan/playwright_tests#readme"
 }
