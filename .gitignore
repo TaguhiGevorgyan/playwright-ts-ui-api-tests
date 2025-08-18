@@ -65,3 +65,4 @@ jspm_packages/
 config/
 config.env.example
 playwright.config.ts
+tests/API_README.md
