@@ -60,3 +60,7 @@ jspm_packages/
 .env.test
 .env.production
 .github/workflows/
+
+# Config files (local only)
+config/
+config.env.example
