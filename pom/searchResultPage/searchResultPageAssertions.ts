@@ -42,11 +42,11 @@ export class SearchResultPageAssertions {
 
   // Search result item assertions
   async expectFirstResultToBeVisible(firstResult: Locator) {
-    expect(await firstResult.isVisible()).toBe(true);
+    await expect(firstResult).toBeVisible();
   }
 
   async expectSearchResultTitleToBeVisible(title: Locator) {
-    expect(await title.isVisible()).toBe(true);
+    await expect(title).toBeVisible();
   }
 
   async expectSearchResultPriceToBeVisible(price: Locator) {

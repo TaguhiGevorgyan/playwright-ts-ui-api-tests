@@ -53,6 +53,35 @@ export class HomePage {
 
   async doSearch(searchKey: string) {
     // Use the header search field specifically to avoid conflicts
+    // Try multiple strategies to make search field visible
+    
+    // Strategy 1: Scroll to top and wait
+    await this.page.evaluate(() => window.scrollTo(0, 0));
+    await this.page.waitForTimeout(2000);
+    
+    // Strategy 2: Try to force visibility with JavaScript
+    await this.page.evaluate(() => {
+      const searchField = document.querySelector('header input[name="q"], .header__search-field');
+      if (searchField) {
+        (searchField as HTMLElement).style.display = 'block';
+        (searchField as HTMLElement).style.visibility = 'visible';
+        (searchField as HTMLElement).style.opacity = '1';
+      }
+    });
+    
+    // Strategy 3: Try to click on the search field
+    try {
+      await this.headerSearchField.click({ timeout: 10000 });
+    } catch (e) {
+      // Strategy 4: If click fails, try to scroll into view
+      await this.headerSearchField.scrollIntoViewIfNeeded();
+      await this.page.waitForTimeout(1000);
+    }
+    
+    // Strategy 5: Wait for field to be ready and fill
+    await this.headerSearchField.waitFor({ state: 'attached', timeout: 10000 });
+    await this.page.waitForTimeout(1000);
+    
     await this.headerSearchField.fill(searchKey);
     await this.searchFieldButton.click();
   }

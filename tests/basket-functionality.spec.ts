@@ -12,7 +12,7 @@ import { BasketAssertions } from '../pom/basketPage/basketPageAssertions';
 // Basic basket functionality test cases
 test.describe('Basic Basket Functionality Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base);
+    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });
@@ -20,6 +20,9 @@ test.describe('Basic Basket Functionality Tests', () => {
   test('Add item to the basket and compare the price and title', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new BasketAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
@@ -109,7 +112,7 @@ test.describe('Basic Basket Functionality Tests', () => {
 // Comprehensive basket functionality test cases
 test.describe('Comprehensive Basket Functionality Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base);
+    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });

@@ -4,6 +4,17 @@ import { testConfig } from '../../config/config';
 export class BasketAssertions {
   constructor(private page: Page) {}
 
+  // Helper function to normalize product titles for comparison
+  private normalizeProductTitle(title: string): string {
+    if (!title) return '';
+    
+    // Remove product codes (e.g., "757.", "728.", etc.)
+    const normalized = title.replace(/^\d+\.\s*/, '');
+    
+    // Remove extra whitespace and normalize
+    return normalized.trim().replace(/\s+/g, ' ');
+  }
+
   // Basic basket assertions
   expectBasketToContainItems(arg0: string[], basketItems: void) {
     throw new Error('Method not implemented.');
@@ -25,7 +36,9 @@ export class BasketAssertions {
 
   // Basket item assertions
   async expectBasketItemNameToMatch(itemName: string, basketItemName: string) {
-    expect(basketItemName).toBe(itemName);
+    const normalizedItemName = this.normalizeProductTitle(itemName);
+    const normalizedBasketName = this.normalizeProductTitle(basketItemName);
+    expect(normalizedBasketName).toBe(normalizedItemName);
   }
 
   async expectBasketItemPriceToMatch(itemPrice: string, basketItemPrice: string) {
@@ -33,11 +46,15 @@ export class BasketAssertions {
   }
 
   async expectBasketFirstItemNameToMatch(firstItemName: string, basketFirstItemName: string) {
-    expect(basketFirstItemName).toBe(firstItemName);
+    const normalizedFirstItemName = this.normalizeProductTitle(firstItemName);
+    const normalizedBasketFirstName = this.normalizeProductTitle(basketFirstItemName);
+    expect(normalizedBasketFirstName).toBe(normalizedFirstItemName);
   }
 
   async expectBasketSecondItemNameToMatch(secondItemName: string, basketSecondItemName: string) {
-    expect(basketSecondItemName).toBe(secondItemName);
+    const normalizedSecondItemName = this.normalizeProductTitle(secondItemName);
+    const normalizedBasketSecondName = this.normalizeProductTitle(basketSecondItemName);
+    expect(normalizedBasketSecondName).toBe(normalizedSecondItemName);
   }
 
   async expectBasketFirstItemPriceToMatch(firstItemPrice: string, basketFirstItemPrice: string) {

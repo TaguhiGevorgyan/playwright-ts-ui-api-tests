@@ -12,7 +12,7 @@ import { OrderFormPom } from '../pom/orderForm/orderFormPom';
 // Order form validation test cases
 test.describe('Order Form Validation Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base);
+    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });

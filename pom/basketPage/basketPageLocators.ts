@@ -2,7 +2,7 @@
 export const BasketPageLocators = {
     basketItem: '.cart-item',
     basketItemTitle: 'a[href*="/product/"]',
-    basketItemPrice: 'text="4 500 ֏"',
+    basketItemPrice: '.price, [data-cart-item-price]',
     itemCounter: '.cart-item .item-counter',
     totalPrice: '.cart-controls .total-amount',
     approveButton: '.cart-controls .button_size-l',

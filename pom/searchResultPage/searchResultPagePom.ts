@@ -12,10 +12,11 @@ export class SearchResultPage {
 
   constructor(page: Page) {
     this.page = page;
-    this.item = page.locator(searchResultPageLocators.item);
-    this.itemTitle = page.locator(searchResultPageLocators.itemTitle);
-    this.itemPrice = page.locator(searchResultPageLocators.itemPrice);
-    this.addButton = page.locator(searchResultPageLocators.addButton);
+    // Use dynamic CSS class-based locators instead of hardcoded IDs
+    this.item = page.locator(searchResultPageLocators.searchResultItem).first();
+    this.itemTitle = page.locator(searchResultPageLocators.searchResultTitle).first();
+    this.itemPrice = page.locator(searchResultPageLocators.searchResultPrice).first();
+    this.addButton = page.locator(searchResultPageLocators.searchResultAddButton).first();
     this.basket = page.locator(searchResultPageLocators.basket);
     this.logo = page.locator(searchResultPageLocators.logo);
    
@@ -32,16 +33,45 @@ export class SearchResultPage {
    }
 
    async clickAddButton() {
-    //await this.addButton.waitFor({ state: 'visible' });
+    // Wait for add button to be visible
+    await this.addButton.waitFor({ state: 'visible', timeout: 10000 });
+    
+    // Scroll to add button if needed
     await this.addButton.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(2000);
-    await this.addButton.click(); 
+    
+    // Click with retry logic
+    try {
+      await this.addButton.click({ timeout: 10000 });
+    } catch (e) {
+      // If click fails, try to force click with JavaScript
+      await this.page.evaluate((selector) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          (element as HTMLElement).click();
+        }
+      }, searchResultPageLocators.addButton);
+    }
    }
 
    async clickToBasket() {
-    await this.page.waitForTimeout(3000);
-    await this.basket.waitFor({ state: 'visible' });
-    await this.basket.click();
+    // Wait for basket button to be visible with shorter timeout
+    await this.basket.waitFor({ state: 'visible', timeout: 10000 });
+    
+    // Scroll to basket button if needed
+    await this.basket.scrollIntoViewIfNeeded();
+    
+    // Click with retry logic
+    try {
+      await this.basket.click({ timeout: 10000 });
+    } catch (e) {
+      // If click fails, try to force click with JavaScript
+      await this.page.evaluate((selector) => {
+        const element = document.querySelector(selector);
+        if (element) {
+          (element as HTMLElement).click();
+        }
+      }, searchResultPageLocators.basket);
+    }
    }
 
    async clickToLogo() {

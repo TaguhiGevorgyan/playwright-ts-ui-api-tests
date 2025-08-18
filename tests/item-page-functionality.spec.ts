@@ -9,7 +9,7 @@ import { ProductItemPageAssertions } from '../pom/productItemPage/productItemPag
 // Item page functionality test cases
 test.describe('Item Page Functionality Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base);
+    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });
@@ -17,6 +17,9 @@ test.describe('Item Page Functionality Tests', () => {
   test('Navigate to item page and verify product details', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
@@ -49,6 +52,9 @@ test.describe('Item Page Functionality Tests', () => {
   test('Add item to basket from item page', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
@@ -85,6 +91,9 @@ test.describe('Item Page Functionality Tests', () => {
   test('Change item quantity on item page', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
@@ -130,6 +139,9 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
+    // Close modal before searching
+    await homePage.closeModal();
+    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
@@ -151,6 +163,9 @@ test.describe('Item Page Functionality Tests', () => {
   test('Add item to favorites', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);

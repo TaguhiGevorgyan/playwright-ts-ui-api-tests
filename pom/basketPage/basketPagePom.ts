@@ -64,16 +64,33 @@ export class BasketPage{
         return price;
     }
     async getItemQuantity(): Promise<string> {
+        // Try to get quantity from input field first
         const quantityInput = this.page.locator(BasketPageLocators.quantityInput).first();
         if (await quantityInput.isVisible()) {
-            return await quantityInput.inputValue();
+            const value = await quantityInput.inputValue();
+            return value || '1';
         }
+        
+        // If no input field, try to get from counter display
+        const counter = this.page.locator(BasketPageLocators.itemCounter).first();
+        if (await counter.isVisible()) {
+            const text = await counter.textContent();
+            if (text) {
+                // Extract number from text like "x2" or "2"
+                const match = text.match(/\d+/);
+                return match ? match[0] : '1';
+            }
+        }
+        
         return '1';
     }
+    
     async increaseItemQuantity() {
         const increaseButton = this.page.locator(BasketPageLocators.increaseQuantityButton).first();
         if (await increaseButton.isVisible()) {
             await increaseButton.click();
+            // Wait for quantity to update
+            await this.page.waitForTimeout(1000);
         }
     }
 
@@ -102,7 +119,7 @@ export class BasketPage{
         this.page = page;
         this.basketItem = page.locator(BasketPageLocators.basketItem);
         this.basketItemTitle = page.locator(BasketPageLocators.basketItem).locator(BasketPageLocators.basketItemTitle);
-        this.basketItemPrice = page.locator(BasketPageLocators.basketItem).locator(BasketPageLocators.basketItemPrice);
+        this.basketItemPrice = page.locator(BasketPageLocators.basketItem).locator(BasketPageLocators.basketItemPrice).first();
         this.itemCounter = page.locator(BasketPageLocators.itemCounter);
         this.totalPrice = page.locator(BasketPageLocators.totalPrice);
         this.approveButton = page.locator(BasketPageLocators.approveButton);

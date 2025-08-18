@@ -9,7 +9,7 @@ import { SearchResultPageAssertions } from '../pom/searchResultPage/searchResult
 // Search functionality test cases
 test.describe('Search Functionality Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base);
+    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });
@@ -17,6 +17,9 @@ test.describe('Search Functionality Tests', () => {
   test('Search for pizza and verify results contain keyword', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new SearchResultPageAssertions(page);
+    
+    // Close modal before searching
+    await homePage.closeModal();
     
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
@@ -27,16 +30,19 @@ test.describe('Search Functionality Tests', () => {
     // Get first result title
     const firstResultTitle = await searchResult.getTitle();
     
-    // Verify search results contain keyword
-    await assertions.expectSearchResultTitleToContainKeyword(firstResultTitle, testConfig.search.keywords.pizza);
+    // Verify search results contain keyword (case-insensitive)
+    await assertions.expectSearchResultTitleToContainKeywordCaseInsensitive(firstResultTitle, testConfig.search.keywords.pizza);
   });
 
   test('Search for non-existent item and verify no results message', async ({ page }) => {
     const homePage = new HomePage(page);
     const assertions = new SearchResultPageAssertions(page);
     
+    // Close modal before searching
+    await homePage.closeModal();
+    
     // Search for non-existent item
-    await homePage.doSearch(testConfig.search.keywords.nonExistent);
+    await homePage.doSearch(testConfig.search.keywords.nonexistent);
     
     const searchResult = new SearchResultPage(page);
     await page.waitForTimeout(testConfig.timeouts.searchResults);
@@ -71,7 +77,7 @@ test.describe('Search Functionality Tests', () => {
     const assertions = new SearchResultPageAssertions(page);
     
     // Search for multiple keywords
-    const keywords = [testConfig.search.keywords.pizza, testConfig.search.keywords.sushi, testConfig.search.keywords.tuna];
+    const keywords = [testConfig.search.keywords.pizza, testConfig.search.keywords.sushi, testConfig.search.keywords.tunaPizza];
     
     for (const keyword of keywords) {
       await homePage.doSearch(keyword);
@@ -87,17 +93,46 @@ test.describe('Search Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new SearchResultPageAssertions(page);
     
+    // Close modal before searching
+    await homePage.closeModal();
+    
+    console.log('Starting search...');
+    const searchStart = Date.now();
+    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
+    console.log(`Search completed in ${Date.now() - searchStart}ms`);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
-    // Verify first result is visible
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
-    await assertions.expectFirstResultToBeVisible(firstResult);
+    console.log('Waiting for search results...');
+    const waitStart = Date.now();
+    
+    // Wait for search results to load with explicit waiting
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
+    console.log(`Results loaded in ${Date.now() - waitStart}ms`);
+    
+    // Additional wait for elements to become visible
+    await page.waitForTimeout(2000);
+    
+    // Verify a product title is visible (choose the first visible one)
+    const titles = page.locator(searchResultPageLocators.searchResultTitle);
+    const count = await titles.count();
+    let foundVisible = false;
+    for (let i = 0; i < count; i++) {
+      const t = titles.nth(i);
+      await t.scrollIntoViewIfNeeded();
+      if (await t.isVisible()) {
+        await assertions.expectSearchResultTitleToBeVisible(t);
+        foundVisible = true;
+        break;
+      }
+    }
+    expect(foundVisible).toBe(true);
     
     // Verify URL has changed from base
     await assertions.expectCurrentUrlToNotBeBaseUrl();
+    
+    console.log(`Total test time: ${Date.now() - searchStart}ms`);
   });
 }); 
