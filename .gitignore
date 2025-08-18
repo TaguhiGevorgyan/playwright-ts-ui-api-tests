@@ -64,3 +64,4 @@ jspm_packages/
 # Config files (local only)
 config/
 config.env.example
+playwright.config.ts
