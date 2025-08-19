@@ -72,7 +72,7 @@ export class SearchResultPage {
         }
         
         // Wait before retry
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForTimeout(500);
       }
     }
     
@@ -81,7 +81,7 @@ export class SearchResultPage {
     }
     
     // Wait for button click to be processed
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(500);
   }
 
    async clickToBasket() {
@@ -90,7 +90,7 @@ export class SearchResultPage {
     
     // Scroll to basket button if needed
     await this.basket.scrollIntoViewIfNeeded();
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(500);
     
     // Click with retry logic
     let basketClicked = false;
@@ -117,7 +117,7 @@ export class SearchResultPage {
         }
         
         // Wait before retry
-        await this.page.waitForTimeout(2000);
+        await this.page.waitForTimeout(500);
       }
     }
     
@@ -153,7 +153,7 @@ export class SearchResultPage {
     
     // Strategy 3: Wait for any page content to stabilize
     try {
-      await this.page.waitForTimeout(3000);
+      await this.page.waitForTimeout(1000);
       console.log('Waited for page to stabilize');
     } catch (error) {
       console.log('Page stabilization wait failed');

@@ -7,7 +7,7 @@ export const BasketPageLocators = {
     totalPrice: '.cart-controls .total-amount',
     approveButton: '.cart-controls .button_size-l',
     totalPriceText: 'text="Ընդհանուր՝: 4 500 ֏"',
-    removeItemButton: '.js-item-delete, .icon-times, button.js-item-delete, button:has-text("🗑"), button:has-text("Remove"), button:has-text("Delete"), button:has-text("×"), button:has-text("✕"), .cart-item button, [data-product-id] button',
+    removeItemButton: '.js-item-delete, .icon-times, button.js-item-delete, button:has-text("🗑"), button:has-text("Remove"), button:has-text("Delete"), button:has-text("×"), button:has-text("✕"), .remove-item-btn, .delete-item-btn, [data-remove-item], [data-delete-item]',
     clearBasketButton: '.clear-basket, .clear-cart, .empty-cart',
     increaseQuantityButton: '.is-count-up, .counter-button.is-count-up, button.is-count-up, button:has-text("➕"), button:has-text("+"), .quantity-increase, .qty-plus, .cart-item .qty-plus',
     decreaseQuantityButton: '.is-count-down, .counter-button.is-count-down, button.is-count-down, button:has-text("➖"), button:has-text("-"), .quantity-decrease, .qty-minus, .cart-item .qty-minus',

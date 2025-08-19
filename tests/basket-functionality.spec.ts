@@ -34,6 +34,10 @@ test.describe('Basic Basket Functionality Tests', () => {
     const firstResultTitle = await searchResult.getTitle();
     const firstResultPrice = await searchResult.getPrice();
     
+    // Debug: Log the retrieved values
+    console.log(`DEBUG: First result title: "${firstResultTitle}"`);
+    console.log(`DEBUG: First result price: "${firstResultPrice}"`);
+    
     // Verify search results contain keyword
     await assertions.expectSearchResultTitleToContainKeyword(firstResultTitle, testConfig.search.keywords.pizza);
     
@@ -122,18 +126,27 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
+    
+    // Wait for price to be visible before retrieving it
+    await page.waitForSelector(searchResultPageLocators.searchResultPrice, { state: 'visible', timeout: 15000 });
     
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
     const firstResultPrice = await searchResult.getPrice();
+    
+    // Debug: Log the retrieved values
+    console.log(`DEBUG: First result title: "${firstResultTitle}"`);
+    console.log(`DEBUG: First result price: "${firstResultPrice}"`);
     
     // Verify search results contain keyword
     await assertions.expectSearchResultTitleToContainKeyword(firstResultTitle, testConfig.search.keywords.pizza);
     
     // Add to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
+    // Wait a moment for the add operation to complete
+    await page.waitForTimeout(1000);
     
     // Navigate to basket
     await searchResult.clickToBasket();
@@ -167,7 +180,8 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add first item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
+    // Wait a moment for the add operation to complete
+    await page.waitForTimeout(1000);
     
     // Navigate back to search results
     await searchResult.clickToLogo();
@@ -179,7 +193,8 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add second item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
+    // Wait a moment for the add operation to complete
+    await page.waitForTimeout(1000);
     
     // Navigate to basket
     await searchResult.clickToBasket();

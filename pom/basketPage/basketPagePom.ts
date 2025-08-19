@@ -110,9 +110,32 @@ export class BasketPage{
                     const element = totalElements[i];
                     const text = await element.textContent();
                     console.log(`Element ${i} with "Ընդհանուր": "${text}"`);
+                    
+                    // Extract price from text like "Ընդհանուր՝: 4 700 ֏" or "Total: 4700"
                     if (text && text.includes('֏')) {
-                        console.log(`Found total price: ${text}`);
-                        return text;
+                        // Look for price pattern: numbers followed by ֏
+                        const priceMatch = text.match(/(\d[\d\s]*)\s*֏/);
+                        if (priceMatch) {
+                            const price = priceMatch[1].replace(/\s/g, '');
+                            console.log(`Extracted total price: ${price}`);
+                            return price + ' ֏';
+                        }
+                    }
+                    
+                    // Also try to find price in parent or sibling elements
+                    try {
+                        const parent = element.locator('..');
+                        const parentText = await parent.textContent();
+                        if (parentText && parentText.includes('֏')) {
+                            const priceMatch = parentText.match(/(\d[\d\s]*)\s*֏/);
+                            if (priceMatch) {
+                                const price = priceMatch[1].replace(/\s/g, '');
+                                console.log(`Found total price in parent: ${price}`);
+                                return price + ' ֏';
+                            }
+                        }
+                    } catch (parentError) {
+                        // Ignore parent errors
                     }
                 } catch (error) {
                     console.log(`Error reading element ${i}:`, (error as Error).message);

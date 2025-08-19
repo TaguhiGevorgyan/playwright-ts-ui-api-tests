@@ -25,13 +25,15 @@ test.describe('Item Page Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
     const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for product page to load instead of static timeout
+      await page.waitForSelector(productItemPageLocators.quantityInput, { state: 'visible', timeout: 30000 });
       
       // Verify we're on product page
       await assertions.expectCurrentUrlToContainProductPage();
@@ -60,13 +62,15 @@ test.describe('Item Page Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
     const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for product page to load instead of static timeout
+      await page.waitForSelector(productItemPageLocators.addToCartButton, { state: 'visible', timeout: 30000 });
       
       // Verify add to basket button is visible
       const addToBasketButton = page.locator(productItemPageLocators.addToCartButton).first();
@@ -74,7 +78,8 @@ test.describe('Item Page Functionality Tests', () => {
       
       // Add item to basket
       await addToBasketButton.click();
-      await page.waitForTimeout(testConfig.timeouts.itemAdd);
+      // Wait for success message instead of static timeout
+      await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
       
       // Verify success message
       const successMessage = page.locator('text=/ավելացվել է|added|successfully added/').first();
@@ -99,13 +104,15 @@ test.describe('Item Page Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
     const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for product page to load instead of static timeout
+      await page.waitForSelector(productItemPageLocators.quantityInput, { state: 'visible', timeout: 30000 });
       
       // Get initial quantity
       const quantityInput = page.locator(productItemPageLocators.quantityInput).first();
@@ -116,7 +123,8 @@ test.describe('Item Page Functionality Tests', () => {
         const increaseButton = page.locator(productItemPageLocators.quantityIncrease).first();
         if (await increaseButton.isVisible()) {
           await increaseButton.click();
-          await page.waitForTimeout(testConfig.timeouts.itemAdd);
+          // Wait for success message instead of static timeout
+          await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
           
           const newQuantity = await quantityInput.inputValue();
           await assertions.expectQuantityToIncrease(initialQuantity, newQuantity);
@@ -125,7 +133,8 @@ test.describe('Item Page Functionality Tests', () => {
           const decreaseButton = page.locator(productItemPageLocators.quantityDecrease).first();
           if (await decreaseButton.isVisible()) {
             await decreaseButton.click();
-            await page.waitForTimeout(testConfig.timeouts.itemAdd);
+            // Wait for success message instead of static timeout
+            await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
             
             const finalQuantity = await quantityInput.inputValue();
             await assertions.expectQuantityToReturnToOriginal(initialQuantity, finalQuantity);
@@ -146,13 +155,15 @@ test.describe('Item Page Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
     const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for product page to load instead of static timeout
+      await page.waitForSelector(productItemPageLocators.productImage, { state: 'visible', timeout: 30000 });
       
       // Verify main image is visible
       const mainImage = page.locator(productItemPageLocators.productImage).first();
@@ -171,13 +182,15 @@ test.describe('Item Page Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+    // Wait for search results to load instead of static timeout
+    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
     const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for product page to load instead of static timeout
+      await page.waitForSelector(productItemPageLocators.addToCartButton, { state: 'visible', timeout: 30000 });
       
       // Verify favorite button is visible
       const favoriteButton = page.locator('.favorite-btn, .wishlist-btn, .like-btn, button:has-text("❤"), button:has-text("♡")').first();

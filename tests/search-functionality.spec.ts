@@ -81,7 +81,8 @@ test.describe('Search Functionality Tests', () => {
     
     for (const keyword of keywords) {
       await homePage.doSearch(keyword);
-      await page.waitForTimeout(testConfig.timeouts.searchResults);
+      // Wait for search results to load instead of static timeout
+      await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
       
       const searchResult = new SearchResultPage(page);
       const resultCount = await searchResult.getResultCount();

@@ -58,7 +58,8 @@ test.describe('Order Form Validation Tests', () => {
     
     if (await makeOrderButton.isVisible()) {
       await makeOrderButton.click();
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for order form to be visible instead of static timeout
+      await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
       
       // Step 4: Verify order form is displayed using proper locator
       const orderForm = page.locator(OrderFormLocators.orderForm).first();
@@ -100,7 +101,8 @@ test.describe('Order Form Validation Tests', () => {
       
       if (await checkoutButton.isVisible()) {
         await checkoutButton.click();
-        await page.waitForTimeout(testConfig.timeouts.pageLoad);
+        // Wait for order form to be visible instead of static timeout
+        await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
         
         const orderForm = page.locator(OrderFormLocators.orderForm).first();
         await assertions.expectOrderFormToBeVisible(orderForm);
@@ -150,7 +152,8 @@ test.describe('Order Form Validation Tests', () => {
     
     try {
       await page.goto(orderFormUrl);
-      await page.waitForTimeout(testConfig.timeouts.pageLoad);
+      // Wait for order form to be visible instead of static timeout
+      await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
       
       const orderForm = page.locator(OrderFormLocators.orderForm).first();
       

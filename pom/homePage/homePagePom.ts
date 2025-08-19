@@ -79,11 +79,11 @@ export class HomePage {
     await this.closeModal();
     
     // Wait a bit for the page to stabilize
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(500);
     
     // Strategy 1: Scroll to top and wait
     await this.page.evaluate(() => window.scrollTo(0, 0));
-    await this.page.waitForTimeout(2000);
+    await this.page.waitForTimeout(500);
     
     // Strategy 2: Try to force visibility with JavaScript
     await this.page.evaluate(() => {
@@ -107,13 +107,13 @@ export class HomePage {
         console.log(`Search field click attempt ${attempt} failed, trying alternative`);
         // Strategy 4: If click fails, try to scroll into view
         await this.headerSearchField.scrollIntoViewIfNeeded();
-        await this.page.waitForTimeout(1000);
+        await this.page.waitForTimeout(500);
       }
     }
     
     // Strategy 5: Wait for field to be ready and fill
     await this.headerSearchField.waitFor({ state: 'attached', timeout: 15000 });
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(500);
     
     // Fill the search field
     await this.headerSearchField.fill(searchKey);
