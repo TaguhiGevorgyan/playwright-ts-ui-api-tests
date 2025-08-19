@@ -9,7 +9,8 @@
   "description": "",
   "devDependencies": {
     "@playwright/test": "^1.54.2",
-    "@types/node": "^24.0.14"
+    "@types/node": "^24.0.14",
+    "typescript": "^5.9.2"
   },
   "directories": {
     "test": "tests"

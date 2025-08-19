@@ -42,7 +42,7 @@ test.describe('Order Form Validation Tests', () => {
     
     // Step 2: Navigate to basket page
     await searchResult.clickToBasket();
-    await page.waitForTimeout(testConfig.timeouts.basketNavigation);
+
     
     const basketPage = new BasketPage(page);
     

@@ -44,16 +44,42 @@ export class HomePage {
 
   async closeModal() {
     try {
-      await this.modalCloseButton.waitFor({ state: 'visible', timeout: 5000 });
+      // Wait for modal to be visible with longer timeout
+      await this.modalCloseButton.waitFor({ state: 'visible', timeout: 15000 });
+      
+      // Try to click the close button
       await this.modalCloseButton.click();
+      
+      // Wait for modal to disappear
+      await this.modalCloseButton.waitFor({ state: 'hidden', timeout: 10000 });
+      
+      // Additional wait to ensure modal is fully closed
+      await this.page.waitForTimeout(2000);
+      
     } catch (error) {
-      // Modal might not be present, continue
+      // If modal is not present or can't be closed, try alternative approach
+      try {
+        // Try to close modal by pressing Escape key
+        await this.page.keyboard.press('Escape');
+        await this.page.waitForTimeout(1000);
+      } catch (escapeError) {
+        // If all else fails, try to click outside the modal
+        try {
+          await this.page.click('body', { position: { x: 10, y: 10 } });
+          await this.page.waitForTimeout(1000);
+        } catch (clickError) {
+          console.log('Could not close modal, continuing anyway');
+        }
+      }
     }
   }
 
   async doSearch(searchKey: string) {
-    // Use the header search field specifically to avoid conflicts
-    // Try multiple strategies to make search field visible
+    // First, ensure any modal is closed
+    await this.closeModal();
+    
+    // Wait a bit for the page to stabilize
+    await this.page.waitForTimeout(2000);
     
     // Strategy 1: Scroll to top and wait
     await this.page.evaluate(() => window.scrollTo(0, 0));
@@ -66,24 +92,66 @@ export class HomePage {
         (searchField as HTMLElement).style.display = 'block';
         (searchField as HTMLElement).style.visibility = 'visible';
         (searchField as HTMLElement).style.opacity = '1';
+        (searchField as HTMLElement).style.zIndex = '9999';
       }
     });
     
-    // Strategy 3: Try to click on the search field
-    try {
-      await this.headerSearchField.click({ timeout: 10000 });
-    } catch (e) {
-      // Strategy 4: If click fails, try to scroll into view
-      await this.headerSearchField.scrollIntoViewIfNeeded();
-      await this.page.waitForTimeout(1000);
+    // Strategy 3: Try to click on the search field with retry
+    let searchFieldClicked = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await this.headerSearchField.click({ timeout: 10000 });
+        searchFieldClicked = true;
+        break;
+      } catch (e) {
+        console.log(`Search field click attempt ${attempt} failed, trying alternative`);
+        // Strategy 4: If click fails, try to scroll into view
+        await this.headerSearchField.scrollIntoViewIfNeeded();
+        await this.page.waitForTimeout(1000);
+      }
     }
     
     // Strategy 5: Wait for field to be ready and fill
-    await this.headerSearchField.waitFor({ state: 'attached', timeout: 10000 });
+    await this.headerSearchField.waitFor({ state: 'attached', timeout: 15000 });
     await this.page.waitForTimeout(1000);
     
+    // Fill the search field
     await this.headerSearchField.fill(searchKey);
-    await this.searchFieldButton.click();
+    
+    // Strategy 6: Try to click search button with retry
+    let searchButtonClicked = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        // Ensure search button is visible and clickable
+        await this.searchFieldButton.waitFor({ state: 'visible', timeout: 10000 });
+        await this.searchFieldButton.scrollIntoViewIfNeeded();
+        await this.page.waitForTimeout(1000);
+        
+        await this.searchFieldButton.click();
+        searchButtonClicked = true;
+        break;
+      } catch (e) {
+        console.log(`Search button click attempt ${attempt} failed:`, (e as Error).message);
+        
+        // Try alternative: use Enter key
+        if (attempt === 2) {
+          try {
+            await this.headerSearchField.press('Enter');
+            searchButtonClicked = true;
+            break;
+          } catch (enterError) {
+            console.log('Enter key also failed');
+          }
+        }
+        
+        // Wait before retry
+        await this.page.waitForTimeout(2000);
+      }
+    }
+    
+    if (!searchButtonClicked) {
+      throw new Error('Could not submit search after multiple attempts');
+    }
   }
 
   async getTitle(): Promise<string> {

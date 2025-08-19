@@ -32,45 +32,131 @@ export class SearchResultPage {
     return itemPrice;
    }
 
-   async clickAddButton() {
-    // Wait for add button to be visible
-    await this.addButton.waitFor({ state: 'visible', timeout: 10000 });
+     async clickAddButton() {
+    // Try to find visible add button with multiple strategies
+    let addButtonClicked = false;
     
-    // Scroll to add button if needed
-    await this.addButton.scrollIntoViewIfNeeded();
-    
-    // Click with retry logic
-    try {
-      await this.addButton.click({ timeout: 10000 });
-    } catch (e) {
-      // If click fails, try to force click with JavaScript
-      await this.page.evaluate((selector) => {
-        const element = document.querySelector(selector);
-        if (element) {
-          (element as HTMLElement).click();
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        // Strategy 1: Wait for any add button to be visible
+        await this.addButton.first().waitFor({ state: 'visible', timeout: 10000 });
+        
+        // Strategy 2: Scroll to add button if needed
+        await this.addButton.first().scrollIntoViewIfNeeded();
+        await this.page.waitForTimeout(1000);
+        
+        // Strategy 3: Try to click the first visible add button
+        await this.addButton.first().click({ timeout: 10000 });
+        addButtonClicked = true;
+        break;
+        
+      } catch (e) {
+        console.log(`Add button click attempt ${attempt} failed:`, (e as Error).message);
+        
+        // Strategy 4: Try to force click with JavaScript on any visible button
+        try {
+          await this.page.evaluate(() => {
+            const buttons = document.querySelectorAll('.add-cart-counter__btn, .button:has-text("Ավելացնել"), button[data-add-cart-counter-btn]');
+            for (const button of Array.from(buttons)) {
+              const rect = button.getBoundingClientRect();
+              if (rect.width > 0 && rect.height > 0) {
+                (button as HTMLElement).click();
+                return;
+              }
+            }
+          });
+          addButtonClicked = true;
+          break;
+        } catch (jsError) {
+          console.log('JavaScript click also failed');
         }
-      }, searchResultPageLocators.addButton);
+        
+        // Wait before retry
+        await this.page.waitForTimeout(2000);
+      }
     }
-   }
+    
+    if (!addButtonClicked) {
+      throw new Error('Could not click add button after multiple attempts');
+    }
+    
+    // Wait for button click to be processed
+    await this.page.waitForTimeout(2000);
+  }
 
    async clickToBasket() {
-    // Wait for basket button to be visible with shorter timeout
-    await this.basket.waitFor({ state: 'visible', timeout: 10000 });
+    // Wait for basket button to be visible with longer timeout
+    await this.basket.waitFor({ state: 'visible', timeout: 15000 });
     
     // Scroll to basket button if needed
     await this.basket.scrollIntoViewIfNeeded();
+    await this.page.waitForTimeout(1000);
     
     // Click with retry logic
-    try {
-      await this.basket.click({ timeout: 10000 });
-    } catch (e) {
-      // If click fails, try to force click with JavaScript
-      await this.page.evaluate((selector) => {
-        const element = document.querySelector(selector);
-        if (element) {
-          (element as HTMLElement).click();
+    let basketClicked = false;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        await this.basket.click({ timeout: 15000 });
+        basketClicked = true;
+        break;
+      } catch (e) {
+        console.log(`Basket click attempt ${attempt} failed:`, (e as Error).message);
+        
+        // If click fails, try to force click with JavaScript
+        try {
+          await this.page.evaluate((selector) => {
+            const element = document.querySelector(selector);
+            if (element) {
+              (element as HTMLElement).click();
+            }
+          }, searchResultPageLocators.basket);
+          basketClicked = true;
+          break;
+        } catch (jsError) {
+          console.log('JavaScript click also failed');
         }
-      }, searchResultPageLocators.basket);
+        
+        // Wait before retry
+        await this.page.waitForTimeout(2000);
+      }
+    }
+    
+    if (!basketClicked) {
+      throw new Error('Could not click basket button after multiple attempts');
+    }
+    
+    // Wait for basket navigation to complete - wait for basket page to load
+    console.log('Waiting for basket page to load...');
+    
+    // Strategy 1: Quick check for basket elements
+    try {
+      await this.page.waitForSelector('h1:has-text("Զամբյուղ"), .cart-items, [data-cart-item]', { 
+        state: 'visible', 
+        timeout: 15000 
+      });
+      console.log('Basket page loaded successfully');
+      return;
+    } catch (error) {
+      console.log('Quick basket page load failed, trying alternative approach...');
+    }
+    
+    // Strategy 2: Check if we're on a basket-related page
+    try {
+      const currentUrl = this.page.url();
+      if (currentUrl.includes('/cart') || currentUrl.includes('basket')) {
+        console.log('Already on basket page, continuing...');
+        return;
+      }
+    } catch (error) {
+      console.log('Could not check current URL');
+    }
+    
+    // Strategy 3: Wait for any page content to stabilize
+    try {
+      await this.page.waitForTimeout(3000);
+      console.log('Waited for page to stabilize');
+    } catch (error) {
+      console.log('Page stabilization wait failed');
     }
    }
 

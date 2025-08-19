@@ -15,6 +15,16 @@ export class BasketAssertions {
     return normalized.trim().replace(/\s+/g, ' ');
   }
 
+  // Helper function to normalize prices for comparison
+  private normalizePrice(price: string): string {
+    if (!price) return '';
+    
+    // Remove extra text like "/հատ" (per piece), whitespace, and normalize
+    const normalized = price.replace(/\s*\/\s*հատ\s*/, '').trim();
+    
+    return normalized;
+  }
+
   // Basic basket assertions
   expectBasketToContainItems(arg0: string[], basketItems: void) {
     throw new Error('Method not implemented.');
@@ -42,7 +52,9 @@ export class BasketAssertions {
   }
 
   async expectBasketItemPriceToMatch(itemPrice: string, basketItemPrice: string) {
-    expect(basketItemPrice).toBe(itemPrice);
+    const normalizedItemPrice = this.normalizePrice(itemPrice);
+    const normalizedBasketPrice = this.normalizePrice(basketItemPrice);
+    expect(normalizedBasketPrice).toBe(normalizedItemPrice);
   }
 
   async expectBasketFirstItemNameToMatch(firstItemName: string, basketFirstItemName: string) {
@@ -58,11 +70,15 @@ export class BasketAssertions {
   }
 
   async expectBasketFirstItemPriceToMatch(firstItemPrice: string, basketFirstItemPrice: string) {
-    expect(basketFirstItemPrice).toBe(firstItemPrice);
+    const normalizedFirstPrice = this.normalizePrice(firstItemPrice);
+    const normalizedBasketFirstPrice = this.normalizePrice(basketFirstItemPrice);
+    expect(normalizedBasketFirstPrice).toBe(normalizedFirstPrice);
   }
 
   async expectBasketSecondItemPriceToMatch(secondItemPrice: string, basketSecondItemPrice: string) {
-    expect(basketSecondItemPrice).toBe(secondItemPrice);
+    const normalizedSecondPrice = this.normalizePrice(secondItemPrice);
+    const normalizedBasketSecondPrice = this.normalizePrice(basketSecondItemPrice);
+    expect(normalizedBasketSecondPrice).toBe(normalizedSecondPrice);
   }
 
   // Total price assertions
