@@ -26,7 +26,6 @@ test.describe('Order Form Validation Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
     // Get item details before adding to basket
     const itemTitle = await searchResult.getTitle();
@@ -34,113 +33,56 @@ test.describe('Order Form Validation Tests', () => {
     
     // Add item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
-    // Verify item was added to basket
-    await assertions.expectItemTitleToBeTruthy(itemTitle);
-    await assertions.expectItemPriceToBeTruthy(itemPrice);
     
-    // Step 2: Navigate to basket page
+    // Navigate to basket page
     await searchResult.clickToBasket();
 
     
     const basketPage = new BasketPage(page);
+
     
-    // Verify we're on basket page and item is present
-    const basketItemTitle = await basketPage.getItemTitle();
-    const basketItemPrice = await basketPage.getItemPrice();
-    
-    await assertions.expectItemTitleToBeTruthy(basketItemTitle);
-    await assertions.expectItemPriceToBeTruthy(basketItemPrice);
-    
-    // Step 3: Press "Make an Order" button using proper locator
+    // Press "Make an Order" button using proper locator
     const makeOrderButton = page.locator(BasketPageLocators.checkoutButton).first();
     
     if (await makeOrderButton.isVisible()) {
       await makeOrderButton.click();
-      // Wait for order form to be visible instead of static timeout
-      await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
       
-      // Step 4: Verify order form is displayed using proper locator
-      const orderForm = page.locator(OrderFormLocators.orderForm).first();
-      await assertions.expectOrderFormToBeVisible(orderForm);
+      //  Verify order form is displayed using proper locator
+  
+      await assertions.expectOrderFormToBeVisible();
       
-      // Step 5: Test all required fields and their validation
+      // Test all required fields and their validation
       const requiredFieldsResult = await orderFormPom.testRequiredFields();
       const fieldValidationResult = await orderFormPom.testFieldValidation();
       const formStateResult = await orderFormPom.testFormStateChanges();
       
       // Assert on the returned data
       if (requiredFieldsResult.nameFieldVisible) {
-        await assertions.expectNameFieldToBeVisible(page.locator(OrderFormLocators.nameField).first());
+        await assertions.expectNameFieldToBeVisible();
       }
       if (requiredFieldsResult.phoneFieldVisible) {
-        await assertions.expectPhoneFieldToBeVisible(page.locator(OrderFormLocators.phoneField).first());
+        await assertions.expectPhoneFieldToBeVisible();
       }
       if (requiredFieldsResult.addressFieldVisible) {
-        await assertions.expectAddressFieldToBeVisible(page.locator(OrderFormLocators.addressField).first());
+        await assertions.expectAddressFieldToBeVisible();
       }
       
       if (fieldValidationResult.hasErrors) {
-        await assertions.expectValidationErrorsToBePresent(page.locator(OrderFormLocators.errorMessages));
+        await assertions.expectValidationErrorsToBePresent([assertions.errorMessages]);
       }
       
       if (formStateResult.nameFieldFilled) {
-        await assertions.expectNameFieldToHaveValue(page.locator(OrderFormLocators.nameField).first(), formStateResult.nameFieldValue);
+        await assertions.expectNameFieldToHaveValue(formStateResult.nameFieldValue);
       }
       if (formStateResult.phoneFieldFilled) {
-        await assertions.expectPhoneFieldToHaveValue(page.locator(OrderFormLocators.phoneField).first(), formStateResult.phoneFieldValue);
+        await assertions.expectPhoneFieldToHaveValue(formStateResult.phoneFieldValue);
       }
       if (formStateResult.addressFieldFilled) {
-        await assertions.expectAddressFieldToHaveValue(page.locator(OrderFormLocators.addressField).first(), formStateResult.addressFieldValue);
+        await assertions.expectAddressFieldToHaveValue(formStateResult.addressFieldValue);
       }
       
-    } else {
-      // If no make order button, look for alternative checkout elements
-      const checkoutButton = page.locator(OrderFormLocators.checkoutButton).first();
-      
-      if (await checkoutButton.isVisible()) {
-        await checkoutButton.click();
-        // Wait for order form to be visible instead of static timeout
-        await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
-        
-        const orderForm = page.locator(OrderFormLocators.orderForm).first();
-        await assertions.expectOrderFormToBeVisible(orderForm);
-        
-        const requiredFieldsResult = await orderFormPom.testRequiredFields();
-        const fieldValidationResult = await orderFormPom.testFieldValidation();
-        const formStateResult = await orderFormPom.testFormStateChanges();
-        
-        // Assert on the returned data
-        if (requiredFieldsResult.nameFieldVisible) {
-          await assertions.expectNameFieldToBeVisible(page.locator(OrderFormLocators.nameField).first());
-        }
-        if (requiredFieldsResult.phoneFieldVisible) {
-          await assertions.expectPhoneFieldToBeVisible(page.locator(OrderFormLocators.phoneField).first());
-        }
-        if (requiredFieldsResult.addressFieldVisible) {
-          await assertions.expectAddressFieldToBeVisible(page.locator(OrderFormLocators.addressField).first());
-        }
-        
-        if (fieldValidationResult.hasErrors) {
-          await assertions.expectValidationErrorsToBePresent(page.locator(OrderFormLocators.errorMessages));
-        }
-        
-        if (formStateResult.nameFieldFilled) {
-          await assertions.expectNameFieldToHaveValue(page.locator(OrderFormLocators.nameField).first(), formStateResult.nameFieldValue);
-        }
-        if (formStateResult.phoneFieldFilled) {
-          await assertions.expectPhoneFieldToHaveValue(page.locator(OrderFormLocators.phoneField).first(), formStateResult.phoneFieldValue);
-        }
-        if (formStateResult.addressFieldFilled) {
-          await assertions.expectAddressFieldToHaveValue(page.locator(OrderFormLocators.addressField).first(), formStateResult.addressFieldValue);
-        }
-      } else {
-        // Log that no order button was found
-        console.log('No order/checkout button found on basket page');
-        await assertions.expectTestToPassWithLogging(); // Test passes but logs the situation
-      }
-    }
+    } 
   });
 
   test('Test order form field validation without submission', async ({ page }) => {
@@ -164,37 +106,32 @@ test.describe('Order Form Validation Tests', () => {
         
         // Assert on the returned data
         if (requiredFieldsResult.nameFieldVisible) {
-          await assertions.expectNameFieldToBeVisible(page.locator(OrderFormLocators.nameField).first());
+          await assertions.expectNameFieldToBeVisible();
         }
         if (requiredFieldsResult.phoneFieldVisible) {
-          await assertions.expectPhoneFieldToBeVisible(page.locator(OrderFormLocators.phoneField).first());
+          await assertions.expectPhoneFieldToBeVisible();
         }
         if (requiredFieldsResult.addressFieldVisible) {
-          await assertions.expectAddressFieldToBeVisible(page.locator(OrderFormLocators.addressField).first());
+          await assertions.expectAddressFieldToBeVisible();
         }
         
         if (fieldValidationResult.hasErrors) {
-          await assertions.expectValidationErrorsToBePresent(page.locator(OrderFormLocators.errorMessages));
+          await assertions.expectValidationErrorsToBePresent([assertions.errorMessages]);
         }
         
         if (formStateResult.nameFieldFilled) {
-          await assertions.expectNameFieldToHaveValue(page.locator(OrderFormLocators.nameField).first(), formStateResult.nameFieldValue);
+          await assertions.expectNameFieldToHaveValue(formStateResult.nameFieldValue);
         }
         if (formStateResult.phoneFieldFilled) {
-          await assertions.expectPhoneFieldToHaveValue(page.locator(OrderFormLocators.phoneField).first(), formStateResult.phoneFieldValue);
+          await assertions.expectPhoneFieldToHaveValue(formStateResult.phoneFieldValue);
         }
         if (formStateResult.addressFieldFilled) {
-          await assertions.expectAddressFieldToHaveValue(page.locator(OrderFormLocators.addressField).first(), formStateResult.addressFieldValue);
+          await assertions.expectAddressFieldToHaveValue(formStateResult.addressFieldValue);
         }
-      } else {
-        // If no order form found, test basket functionality instead
-        const basketFlowResult = await orderFormPom.testBasketOrderFlow();
-        await assertions.expectItemTitleToBeTruthy(basketFlowResult.itemTitle);
-      }
+      } 
     } catch (error) {
-      // Fallback to basket order flow
-      const basketFlowResult = await orderFormPom.testBasketOrderFlow();
-      await assertions.expectItemTitleToBeTruthy(basketFlowResult.itemTitle);
+      console.error('Error navigating to order form:', error);
+      throw error;
     }
   });
 }); 

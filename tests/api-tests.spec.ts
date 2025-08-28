@@ -32,7 +32,7 @@ test.describe('API Tests (Mock Responses)', () => {
     expect(responseTime).toBeLessThan(apiConfig.performance.maxResponseTime);
     expect(apiHelpers.isResponseTimeAcceptable(responseTime)).toBe(true);
 
-    console.log(`✅ Products API test passed (Mock). Status: ${responseStatus}, Response time: ${apiHelpers.formatResponseTime(responseTime)}`);
+            console.log(`Products API test passed (Mock). Status: ${responseStatus}, Response time: ${apiHelpers.formatResponseTime(responseTime)}`);
   });
 
   test('POST Search API - Search products with query (Mock)', async ({ request }) => {
@@ -94,6 +94,6 @@ test.describe('API Tests (Mock Responses)', () => {
       expect(responseBody.limit).toBeLessThanOrEqual(searchPayload.limit);
     }
 
-    console.log(`✅ Search API test passed (Mock). Status: ${responseStatus}, Query: "${searchPayload.query}", Results: ${responseBody.results?.length || 0}, Response time: ${apiHelpers.formatResponseTime(responseTime)}`);
+            console.log(`Search API test passed (Mock). Status: ${responseStatus}, Query: "${searchPayload.query}", Results: ${responseBody.results?.length || 0}, Response time: ${apiHelpers.formatResponseTime(responseTime)}`);
   });
 }); 

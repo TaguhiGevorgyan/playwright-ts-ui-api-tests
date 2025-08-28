@@ -8,12 +8,13 @@ export const HomePageLocators = {
     itemTitle: '.product-preview__title',
     itemPrice: '.product-preview__price-cur, .product-preview__price-range',
     headerSearchField: 'header input[name="q"], .header__search-field',
-    mainSearchField: 'main input[name="q"], .search-form__field',
-    productGrid: '.product-grid, .products-grid, .catalog-grid',
-    productCard: '.product-card, .product-preview, .catalog-item',
-    productTitle: '.product-title, .product-preview__title, .catalog-item__title',
-    productPrice: '.product-price, .product-preview__price, .catalog-item__price',
-    addToCartButton: '.add-to-cart, .add-cart-counter__btn, .buy-button',
-    cartIcon: '.cart-icon, .cart-fixed-btn, .shopping-cart',
-    logo: '.logo, .header__logo, .site-logo'
+    mainSearchField: 'input[name="q"], .search-form input',
+    productGrid: '.product-grid, .products-grid',
+    productCard: '.product-preview, .catalog-item',
+    productTitle: '.product-preview__title, .catalog-item__title',
+    productPrice: '.product-preview__price, .catalog-item__price',
+    addToCartButton: '.add-cart-counter__btn, .buy-button',
+    cartIcon: '.cart-fixed-btn, .shopping-cart',
+    logo: '.header__logo, .site-logo',
+    basketCount: '.cart-count, .basket-count, .cart-counter, [data-cart-count]'
 }

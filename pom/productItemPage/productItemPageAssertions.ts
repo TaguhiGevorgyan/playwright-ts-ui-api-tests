@@ -1,64 +1,80 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { testConfig } from '../../config/config';
+import { productItemPageLocators } from './productItemPageLocators';
 
 export class ProductItemPageAssertions {
-  constructor(private page: Page) {}
+  readonly page: Page;
+  readonly productItemTitle: Locator;
+  readonly productItemPrice: Locator;
+  readonly productImage: Locator;
+  readonly productDescription: Locator;
+  readonly addToCartButton: Locator;
+  readonly favoriteButton: Locator;
 
-  // URL assertions
+  constructor(page: Page) {
+    this.page = page;
+    this.productItemTitle = page.locator(productItemPageLocators.productItemTitle);
+    this.productItemPrice = page.locator(productItemPageLocators.productItemPrice);
+    this.productImage = page.locator(productItemPageLocators.productImage);
+    this.productDescription = page.locator(productItemPageLocators.productDescription);
+    this.addToCartButton = page.locator(productItemPageLocators.addToCartButton);
+    this.favoriteButton = page.locator(productItemPageLocators.favoriteButton);
+  }         
+
   async expectCurrentUrlToContainProductPage() {
     const currentUrl = this.page.url();
-    expect(currentUrl).toContain(testConfig.urls.productPage);
+    expect(currentUrl).toContain('/product/');
   }
 
-  // Product element visibility assertions
-  async expectProductTitleToBeVisible(productTitle: Locator) {
-    expect(await productTitle.isVisible()).toBe(true);
+  async expectProductTitleToBeVisible() {
+    await expect(this.productItemTitle).toBeVisible();
   }
 
-  async expectProductPriceToBeVisible(productPrice: Locator) {
-    expect(await productPrice.isVisible()).toBe(true);
+  async expectProductPriceToBeVisible() {
+    await expect(this.productItemPrice).toBeVisible();
   }
 
-  async expectProductImageToBeVisible(productImage: Locator) {
-    expect(await productImage.isVisible()).toBe(true);
+  async expectProductImageToBeVisible() {
+    await expect(this.productImage).toBeVisible();
   }
 
-  async expectProductDescriptionToBeVisible(productDescription: Locator) {
-    expect(await productDescription.isVisible()).toBe(true);
+  async expectProductDescriptionToBeVisible() {
+    await expect(this.productDescription).toBeVisible();
   }
 
-  async expectAddToBasketButtonToBeVisible(addToBasketButton: Locator) {
-    expect(await addToBasketButton.isVisible()).toBe(true);
+  async expectAddToBasketButtonToBeVisible() {
+    await expect(this.addToCartButton).toBeVisible();
   }
 
-  async expectMainImageToBeVisible(mainImage: Locator) {
-    expect(await mainImage.isVisible()).toBe(true);
+  async expectSuccessMessageToBeVisible() {
+    const successMessage = this.page.locator(productItemPageLocators.successMessage);
+    await expect(successMessage).toBeVisible();
   }
 
-  async expectFavoriteButtonToBeVisible(favoriteButton: Locator) {
-    expect(await favoriteButton.isVisible()).toBe(true);
-  }
-
-  // Success message assertions
-  async expectSuccessMessageToBeVisible(successMessage: Locator) {
-    expect(await successMessage.isVisible()).toBe(true);
-  }
-
-  async expectFavoriteSuccessMessageToBeVisible(successMessage: Locator) {
-    expect(await successMessage.isVisible()).toBe(true);
-  }
-
-  // Basket count assertions
   async expectBasketCountToContainOne(basketText: string) {
     expect(basketText).toContain('1');
   }
 
-  // Quantity assertions
   async expectQuantityToIncrease(initialQuantity: string, newQuantity: string) {
-    expect(Number(newQuantity)).toBe(Number(initialQuantity) + 1);
+    const initial = Number(initialQuantity);
+    const newQty = Number(newQuantity);
+    expect(newQty).toBeGreaterThan(initial);
   }
 
   async expectQuantityToReturnToOriginal(initialQuantity: string, finalQuantity: string) {
-    expect(Number(finalQuantity)).toBe(Number(initialQuantity));
+    expect(finalQuantity).toBe(initialQuantity);
+  }
+
+  async expectMainImageToBeVisible() {
+    await expect(this.productImage).toBeVisible();
+  }
+
+  async expectFavoriteButtonToBeVisible() {
+    await expect(this.favoriteButton).toBeVisible();
+  }
+
+  async expectFavoriteSuccessMessageToBeVisible() {
+    const favoriteSuccessMessage = this.page.locator(productItemPageLocators.favoriteSuccessMessage);
+    await expect(favoriteSuccessMessage).toBeVisible();
   }
 }

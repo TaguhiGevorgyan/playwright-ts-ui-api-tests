@@ -2,7 +2,7 @@
 
 This repository contains comprehensive Playwright tests for the Sushi Mushi website, covering search functionality and basket operations.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Prerequisites
 - Node.js (v16 or higher)
@@ -28,7 +28,7 @@ npx playwright test tests/tests.spec.ts
 PWDEBUG=1 npx playwright test
 ```
 
-## 🔧 Environment Configuration
+##  Environment Configuration
 
 This project uses environment variables for configuration management. This approach provides several benefits:
 
@@ -221,7 +221,7 @@ SEARCH_RESULTS_TIMEOUT=2000
 - Verify the file is in the correct location
 - Check for typos in variable names
 
-## 📝 Contributing
+##  Contributing
 
 1. **Update `config.env.example`** when adding new configuration options
 2. **Document new environment variables** in this README

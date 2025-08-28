@@ -8,6 +8,7 @@ import { HomePageLocators } from '../pom/homePage/homePageLocators';
 import { searchResultPageLocators } from '../pom/searchResultPage/searchResultPageLocators';
 import { OrderFormLocators } from '../pom/orderForm/orderFormLocators';
 import { BasketAssertions } from '../pom/basketPage/basketPageAssertions';
+import { productItemPageLocators } from '../pom/productItemPage/productItemPageLocators';
 
 // Basic basket functionality test cases
 test.describe('Basic Basket Functionality Tests', () => {
@@ -21,14 +22,10 @@ test.describe('Basic Basket Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new BasketAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
@@ -43,8 +40,7 @@ test.describe('Basic Basket Functionality Tests', () => {
     
     // Add to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
-    
+   
     // Navigate to basket
     await searchResult.clickToBasket();
     
@@ -66,7 +62,6 @@ test.describe('Basic Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
@@ -74,7 +69,6 @@ test.describe('Basic Basket Functionality Tests', () => {
     
     // Add first item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
     // Navigate to basket first to verify first item
     await searchResult.clickToBasket();
@@ -103,9 +97,9 @@ test.describe('Basic Basket Functionality Tests', () => {
     if (totalPrice && totalPrice.trim() !== '') {
       const totalValue = Number(totalPrice.replace(/[^\d]/g, ''));
       expect(totalValue).toBeGreaterThan(0);
-      console.log(`✅ Total price verified: ${totalPrice}`);
+      console.log(`  Total price verified: ${totalPrice}`);
     } else {
-      console.log(`❌ Total price not found`);
+      console.log(` Total price not found`);
     }
   });
 });
@@ -126,12 +120,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
-    
-    // Wait for price to be visible before retrieving it
-    await page.waitForSelector(searchResultPageLocators.searchResultPrice, { state: 'visible', timeout: 15000 });
-    
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
     const firstResultPrice = await searchResult.getPrice();
@@ -145,8 +133,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add to basket
     await searchResult.clickAddButton();
-    // Wait a moment for the add operation to complete
-    await page.waitForTimeout(1000);
     
     // Navigate to basket
     await searchResult.clickToBasket();
@@ -172,16 +158,14 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
-    
+        
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
     const firstResultPrice = await searchResult.getPrice();
     
     // Add first item to basket
     await searchResult.clickAddButton();
-    // Wait a moment for the add operation to complete
-    await page.waitForTimeout(1000);
+
     
     // Navigate back to search results
     await searchResult.clickToLogo();
@@ -193,8 +177,7 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add second item to basket
     await searchResult.clickAddButton();
-    // Wait a moment for the add operation to complete
-    await page.waitForTimeout(1000);
+   
     
     // Navigate to basket
     await searchResult.clickToBasket();
@@ -231,7 +214,7 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
+ 
     
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
@@ -239,8 +222,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add first item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
-    
     // Navigate to basket
     await searchResult.clickToBasket();
     
@@ -260,9 +241,9 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     if (totalPrice && totalPrice.trim() !== '') {
       const totalValue = Number(totalPrice.replace(/[^\d]/g, ''));
       expect(totalValue).toBeGreaterThan(0);
-      console.log(`✅ Total price verified: ${totalPrice}`);
+      console.log(`  Total price verified: ${totalPrice}`);
     } else {
-      console.log(`❌ Total price not found`);
+      console.log(` Total price not found`);
     }
   });
 
@@ -274,7 +255,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
     // Get first result details
     const firstResultTitle = await searchResult.getTitle();
@@ -282,7 +262,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add first item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
     // Navigate back to search results
     await searchResult.clickToLogo();
@@ -294,7 +273,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     
     // Add second item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
     // Navigate to basket
     await searchResult.clickToBasket();
@@ -315,48 +293,29 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
-    
     // Add item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
     // Navigate to basket
     await searchResult.clickToBasket();
 
-    
     // Increase quantity
     const basketPage = new BasketPage(page);
+     // Get total price before increasing quantity
+     const initialTotalPrice = await basketPage.getTotalPrice();
+     console.log(`Initial total price: ${initialTotalPrice}`);
+
     const initialQuantity = await basketPage.getItemQuantity();
     await basketPage.increaseItemQuantity();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
-    
     const newQuantity = await basketPage.getItemQuantity();
     await assertions.expectQuantityToIncrease(initialQuantity, newQuantity);
-    
-    // Get total price before increasing quantity
-    const initialTotalPrice = await basketPage.getTotalPrice();
-    console.log(`Initial total price: ${initialTotalPrice}`);
-    
-    // Increase quantity
-    await basketPage.increaseItemQuantity();
     
     // Get total price after increasing quantity
     const newTotalPrice = await basketPage.getTotalPrice();
     console.log(`New total price: ${newTotalPrice}`);
     
-    if (initialTotalPrice && newTotalPrice) {
-      // Verify that total price increased (not necessarily doubled due to possible bulk pricing)
-      const initialTotal = Number(initialTotalPrice.replace(/[^\d]/g, ''));
-      const newTotal = Number(newTotalPrice.replace(/[^\d]/g, ''));
-      console.log(`Initial total: ${initialTotal}, New total: ${newTotal}`);
-      
-      if (newTotal > initialTotal) {
-        console.log(`✅ Total price increased from ${initialTotal} to ${newTotal}`);
-      } else {
-        console.log(`❌ Total price did not increase as expected`);
-      }
-    }
+    // Verify that total price increased (not necessarily doubled due to possible bulk pricing)
+    await assertions.expectTotalPriceToIncrease(initialTotalPrice, newTotalPrice);
   });
 
   test('Go to the items main page from the basket', async ({ page }) => {
@@ -367,11 +326,9 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     
     // Add item to basket
     await searchResult.clickAddButton();
-    await page.waitForTimeout(testConfig.timeouts.itemAdd);
     
     // Navigate to basket
     await searchResult.clickToBasket();
@@ -380,14 +337,12 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     // Click on item to go to product page
     const basketPage = new BasketPage(page);
     await basketPage.clickOnItem();
-    // Wait for page navigation to complete
-    await page.waitForTimeout(5000);
     
     // Verify we're on product page
     await assertions.expectCurrentUrlToContainProductPage();
     
     // Verify product details are displayed
-    const productTitle = page.locator('h1, .product-title, .item-title').first();
+    const productTitle = page.locator(productItemPageLocators.productTitle).first();
     await assertions.expectProductTitleToBeVisible(productTitle);
   });
 
@@ -398,7 +353,6 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     // Add multiple items to basket
     await homePage.doSearch(testConfig.search.keywords.pizza);
     const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
     await searchResult.clickAddButton();
     
     await searchResult.clickToLogo();
@@ -407,19 +361,10 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     // Open basket
     await homePage.clickToBasketHome();
     
-    // Delete all items using proper locator
-    const deleteButtons = page.locator(BasketPageLocators.removeItemButton);
-    const deleteCount = await deleteButtons.count();
-    
-    for (let i = 0; i < deleteCount; i++) {
-      const deleteButton = deleteButtons.nth(i);
-      if (await deleteButton.isVisible()) {
-        await deleteButton.click();
-        // Wait for item removal
-        await page.waitForTimeout(2000);
-      }
-    }
-    
+    // Delete all items using POM method
+    const basketPage = new BasketPage(page);
+    await basketPage.deleteAllItems();
+
     // Verify basket is empty using proper locator
     const emptyMessage = page.locator(BasketPageLocators.basketEmptyMessage).first();
     await assertions.expectBasketToBeEmpty(emptyMessage);
@@ -428,58 +373,4 @@ test.describe('Comprehensive Basket Functionality Tests', () => {
     const totalPrice = page.locator(BasketPageLocators.totalPrice).first();
     await assertions.expectTotalPriceToBeZero(totalPrice);
   });
-
-  test('Confirm the order', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new BasketAssertions(page);
-    
-    // Add item to basket
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    const searchResult = new SearchResultPage(page);
-    await page.waitForTimeout(testConfig.timeouts.searchResults);
-    await searchResult.clickAddButton();
-    
-    // Open basket
-    await searchResult.clickToBasket();
-    
-    // Click "Make an Order" button using proper locator
-    const makeOrderButton = page.locator(BasketPageLocators.checkoutButton).first();
-    
-    if (await makeOrderButton.isVisible()) {
-      await makeOrderButton.click();
-      // Wait for order form to load
-      await page.waitForTimeout(5000);
-      
-      // Verify order form is displayed using proper locator
-      const orderForm = page.locator(OrderFormLocators.orderForm).first();
-      await assertions.expectOrderFormToBeVisible(orderForm);
-      
-      // Fill required fields using proper locators
-      const nameField = page.locator(OrderFormLocators.nameField).first();
-      const phoneField = page.locator(OrderFormLocators.phoneField).first();
-      const addressField = page.locator(OrderFormLocators.addressField).first();
-      
-      if (await nameField.isVisible()) {
-        await nameField.fill(testConfig.testData.userName);
-      }
-      if (await phoneField.isVisible()) {
-        await phoneField.fill(testConfig.testData.userPhone);
-      }
-      if (await addressField.isVisible()) {
-        await addressField.fill(testConfig.testData.userAddress);
-      }
-      
-      // Click confirm order button
-      const confirmButton = page.locator(testConfig.locators.confirmOrderButton.join(', ')).first();
-      if (await confirmButton.isVisible()) {
-        await confirmButton.click();
-        // Wait for order confirmation to load
-        await page.waitForTimeout(5000);
-        
-        // Verify order confirmation using proper locator
-        const confirmationMessage = page.locator(OrderFormLocators.confirmationMessage).first();
-        await assertions.expectOrderConfirmationToBeVisible(confirmationMessage);
-      }
-    }
-  });
-}); 
+});

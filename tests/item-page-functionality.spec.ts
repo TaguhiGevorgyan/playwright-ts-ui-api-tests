@@ -18,22 +18,15 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
+    const firstResult = page.locator(searchResultPageLocators.item).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      // Wait for product page to load instead of static timeout
-      await page.waitForSelector(productItemPageLocators.quantityInput, { state: 'visible', timeout: 30000 });
       
       // Verify we're on product page
       await assertions.expectCurrentUrlToContainProductPage();
@@ -44,10 +37,10 @@ test.describe('Item Page Functionality Tests', () => {
       const productImage = page.locator(productItemPageLocators.productImage).first();
       const productDescription = page.locator(productItemPageLocators.productDescription).first();
       
-      await assertions.expectProductTitleToBeVisible(productTitle);
-      await assertions.expectProductPriceToBeVisible(productPrice);
-      await assertions.expectProductImageToBeVisible(productImage);
-      await assertions.expectProductDescriptionToBeVisible(productDescription);
+      await assertions.expectProductTitleToBeVisible();
+      await assertions.expectProductPriceToBeVisible();
+      await assertions.expectProductImageToBeVisible();
+      await assertions.expectProductDescriptionToBeVisible();
     }
   });
 
@@ -55,37 +48,25 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
-    
+
     // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
+    const firstResult = page.locator(searchResultPageLocators.item).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      // Wait for product page to load instead of static timeout
-      await page.waitForSelector(productItemPageLocators.addToCartButton, { state: 'visible', timeout: 30000 });
-      
+     
       // Verify add to basket button is visible
       const addToBasketButton = page.locator(productItemPageLocators.addToCartButton).first();
-      await assertions.expectAddToBasketButtonToBeVisible(addToBasketButton);
+      await assertions.expectAddToBasketButtonToBeVisible();
       
       // Add item to basket
       await addToBasketButton.click();
-      // Wait for success message instead of static timeout
-      await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
       
       // Verify success message
-      const successMessage = page.locator('text=/ավելացվել է|added|successfully added/').first();
-      if (await successMessage.isVisible()) {
-        await assertions.expectSuccessMessageToBeVisible(successMessage);
-      }
+        await assertions.expectSuccessMessageToBeVisible();
       
       // Verify basket count increased
       const basketText = await homePage.getBasketCount();
@@ -97,22 +78,15 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
+    const firstResult = page.locator(searchResultPageLocators.item).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      // Wait for product page to load instead of static timeout
-      await page.waitForSelector(productItemPageLocators.quantityInput, { state: 'visible', timeout: 30000 });
       
       // Get initial quantity
       const quantityInput = page.locator(productItemPageLocators.quantityInput).first();
@@ -123,18 +97,14 @@ test.describe('Item Page Functionality Tests', () => {
         const increaseButton = page.locator(productItemPageLocators.quantityIncrease).first();
         if (await increaseButton.isVisible()) {
           await increaseButton.click();
-          // Wait for success message instead of static timeout
-          await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
           
           const newQuantity = await quantityInput.inputValue();
           await assertions.expectQuantityToIncrease(initialQuantity, newQuantity);
           
           // Decrease quantity back to original
           const decreaseButton = page.locator(productItemPageLocators.quantityDecrease).first();
-          if (await decreaseButton.isVisible()) {
+        if (await decreaseButton.isVisible()) {
             await decreaseButton.click();
-            // Wait for success message instead of static timeout
-            await page.waitForSelector('text=/ավելացվել է|added|successfully added/', { state: 'visible', timeout: 15000 });
             
             const finalQuantity = await quantityInput.inputValue();
             await assertions.expectQuantityToReturnToOriginal(initialQuantity, finalQuantity);
@@ -148,26 +118,19 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
-    
+
     // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
+    const firstResult = page.locator(searchResultPageLocators.item).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      // Wait for product page to load instead of static timeout
-      await page.waitForSelector(productItemPageLocators.productImage, { state: 'visible', timeout: 30000 });
       
       // Verify main image is visible
       const mainImage = page.locator(productItemPageLocators.productImage).first();
-      await assertions.expectMainImageToBeVisible(mainImage);
+      await assertions.expectMainImageToBeVisible();
     }
   });
 
@@ -175,26 +138,19 @@ test.describe('Item Page Functionality Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new ProductItemPageAssertions(page);
     
-    // Close modal before searching
-    await homePage.closeModal();
-    
     // Search for pizza
     await homePage.doSearch(testConfig.search.keywords.pizza);
     
     const searchResult = new SearchResultPage(page);
-    // Wait for search results to load instead of static timeout
-    await page.waitForSelector(searchResultPageLocators.searchResultItem, { state: 'attached', timeout: 30000 });
     
     // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.searchResultItem).first();
+    const firstResult = page.locator(searchResultPageLocators.item).first();
     if (await firstResult.isVisible()) {
       await firstResult.click();
-      // Wait for product page to load instead of static timeout
-      await page.waitForSelector(productItemPageLocators.addToCartButton, { state: 'visible', timeout: 30000 });
-      
+
       // Verify favorite button is visible
-      const favoriteButton = page.locator('.favorite-btn, .wishlist-btn, .like-btn, button:has-text("❤"), button:has-text("♡")').first();
-      await assertions.expectFavoriteButtonToBeVisible(favoriteButton);
+      const favoriteButton = page.locator(productItemPageLocators.favoriteButton).first();
+      await assertions.expectFavoriteButtonToBeVisible();
       
       // Add to favorites
       await favoriteButton.click();
@@ -203,7 +159,7 @@ test.describe('Item Page Functionality Tests', () => {
       // Verify success message
       const successMessage = page.locator('text=/added to favorites|added to wishlist|հավանել եք/').first();
       if (await successMessage.isVisible()) {
-        await assertions.expectFavoriteSuccessMessageToBeVisible(successMessage);
+        await assertions.expectFavoriteSuccessMessageToBeVisible();
       }
     }
   });

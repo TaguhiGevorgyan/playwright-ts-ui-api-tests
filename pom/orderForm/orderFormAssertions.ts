@@ -1,74 +1,56 @@
 import { expect, Locator, Page } from '@playwright/test';
 import { testConfig } from '../../config/config';
+import { OrderFormLocators } from './orderFormLocators';
 
 export class OrderFormAssertions {
-  constructor(private page: Page) {}
+    readonly page: Page;
+    readonly nameField: Locator;
+    readonly phoneField: Locator;
+    readonly addressField: Locator;
+    readonly errorMessages: Locator;
 
-  // Form field visibility assertions
-  async expectNameFieldToBeVisible(nameField: Locator) {
-    if (await nameField.isVisible()) {
-      expect(await nameField.isVisible()).toBe(true);
+    constructor(page: Page) {
+        this.page = page;
+        this.nameField = page.locator(OrderFormLocators.nameField);
+        this.phoneField = page.locator(OrderFormLocators.phoneField);
+        this.addressField = page.locator(OrderFormLocators.addressField);
+        this.errorMessages = page.locator(OrderFormLocators.errorMessages);
     }
-  }
 
-  async expectPhoneFieldToBeVisible(phoneField: Locator) {
-    if (await phoneField.isVisible()) {
-      expect(await phoneField.isVisible()).toBe(true);
+    async expectNameFieldToBeVisible() {
+        await expect(this.nameField).toBeVisible();
     }
-  }
 
-  async expectAddressFieldToBeVisible(addressField: Locator) {
-    if (await addressField.isVisible()) {
-      expect(await addressField.isVisible()).toBe(true);
+    async expectPhoneFieldToBeVisible() {
+        await expect(this.phoneField).toBeVisible();
     }
-  }
 
-  // Form validation assertions
-  async expectValidationErrorsToBePresent(errorMessages: Locator) {
-    const errorCount = await errorMessages.count();
-    if (errorCount > 0) {
-      expect(errorCount).toBeGreaterThan(0);
+    async expectAddressFieldToBeVisible() {
+        await expect(this.addressField).toBeVisible();
     }
-  }
 
-  // Form field value assertions
-  async expectNameFieldToHaveValue(nameField: Locator, expectedValue: string) {
-    if (await nameField.isVisible()) {
-      const nameValue = await nameField.inputValue();
-      expect(nameValue).toBe(expectedValue);
+    async expectValidationErrorsToBePresent(errorMessages: Locator[]) {
+        for (const errorMessage of errorMessages) {
+            await expect(errorMessage).toBeVisible();
+        }
     }
-  }
 
-  async expectPhoneFieldToHaveValue(phoneField: Locator, expectedValue: string) {
-    if (await phoneField.isVisible()) {
-      const phoneValue = await phoneField.inputValue();
-      expect(phoneValue).toBe(expectedValue);
+    async expectNameFieldToHaveValue(name: string) {
+        await expect(this.nameField).toHaveValue(name);
     }
-  }
-
-  async expectAddressFieldToHaveValue(addressField: Locator, expectedValue: string) {
-    if (await addressField.isVisible()) {
-      const addressValue = await addressField.inputValue();
-      expect(addressValue).toBe(expectedValue);
+    
+    async expectPhoneFieldToHaveValue(phone: string) {
+        await expect(this.phoneField).toHaveValue(phone);
     }
-  }
 
-  // Form visibility assertions
-  async expectOrderFormToBeVisible(orderForm: Locator) {
-    expect(await orderForm.isVisible()).toBe(true);
-  }
+    async expectAddressFieldToHaveValue(address: string) {
+        await expect(this.addressField).toHaveValue(address);
+    }
+    async expectOrderFormToBeVisible() {
+        const orderForm = this.page.locator(OrderFormLocators.orderForm);
+        await expect(orderForm).toBeVisible();
+    }
 
-  // Generic item assertions
-  async expectItemTitleToBeTruthy(itemTitle: string | null) {
-    expect(itemTitle).toBeTruthy();
-  }
 
-  async expectItemPriceToBeTruthy(itemPrice: string | null) {
-    expect(itemPrice).toBeTruthy();
-  }
-
-  // Fallback test assertions
-  async expectTestToPassWithLogging() {
-    expect(true).toBe(true); // Test passes but logs the situation
-  }
+    
 } 
