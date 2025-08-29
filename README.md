@@ -1,6 +1,6 @@
 # Sushi Mushi Playwright Test Suite
 
-This repository contains comprehensive Playwright tests for the Sushi Mushi website, covering search functionality and basket operations.
+This repository contains comprehensive Playwright tests for the Sushi Mushi website.
 
 ##  Quick Start
 
