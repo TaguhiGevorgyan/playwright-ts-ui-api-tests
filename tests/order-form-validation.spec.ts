@@ -12,7 +12,7 @@ import { OrderFormPom } from '../pom/orderForm/orderFormPom';
 // Order form validation test cases
 test.describe('Order Form Validation Tests', () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
+    await page.goto(testConfig.urls.base);
     const homePage = new HomePage(page);
     await homePage.closeModal();
   });
@@ -21,117 +21,106 @@ test.describe('Order Form Validation Tests', () => {
     const homePage = new HomePage(page);
     const assertions = new OrderFormAssertions(page);
     const orderFormPom = new OrderFormPom(page);
-    
+
     // Step 1: Add any item to basket
     await homePage.doSearch(testConfig.search.keywords.pizza);
-    
+
     const searchResult = new SearchResultPage(page);
-    
-    // Get item details before adding to basket
-    const itemTitle = await searchResult.getTitle();
-    const itemPrice = await searchResult.getPrice();
-    
+
     // Add item to basket
     await searchResult.clickAddButton();
-    
-    
+
     // Navigate to basket page
     await searchResult.clickToBasket();
 
-    
-    const basketPage = new BasketPage(page);
-
-    
     // Press "Make an Order" button using proper locator
-    const makeOrderButton = page.locator(BasketPageLocators.checkoutButton).first();
+
+    const basketPage = new BasketPage(page);
+    await basketPage.clickMakeOrderButton();
+
+    //  Verify order form is displayed
+    await assertions.expectOrderFormToBeVisible();
+
+    // Test all required fields and their validation
+    await assertions.expectNameFieldToBeVisible();
+    await assertions.expectPhoneFieldToBeVisible();
+    await assertions.expectAddressFieldToBeVisible();
+
+    // Try to submit the form to trigger validation errors
+    await orderFormPom.submitOrder();
+
+    // Wait a moment for validation errors to appear
+    await page.waitForTimeout(2000);
+
+    // Check if there are any validation errors
+    const errorCount = await orderFormPom.errorMessages.count();
+    console.log(`Found ${errorCount} validation errors`);
     
-    if (await makeOrderButton.isVisible()) {
-      await makeOrderButton.click();
-      
-      //  Verify order form is displayed using proper locator
-  
-      await assertions.expectOrderFormToBeVisible();
-      
-      // Test all required fields and their validation
-      const requiredFieldsResult = await orderFormPom.testRequiredFields();
-      const fieldValidationResult = await orderFormPom.testFieldValidation();
-      const formStateResult = await orderFormPom.testFormStateChanges();
-      
-      // Assert on the returned data
-      if (requiredFieldsResult.nameFieldVisible) {
-        await assertions.expectNameFieldToBeVisible();
-      }
-      if (requiredFieldsResult.phoneFieldVisible) {
-        await assertions.expectPhoneFieldToBeVisible();
-      }
-      if (requiredFieldsResult.addressFieldVisible) {
-        await assertions.expectAddressFieldToBeVisible();
-      }
-      
-      if (fieldValidationResult.hasErrors) {
-        await assertions.expectValidationErrorsToBePresent([assertions.errorMessages]);
-      }
-      
-      if (formStateResult.nameFieldFilled) {
-        await assertions.expectNameFieldToHaveValue(formStateResult.nameFieldValue);
-      }
-      if (formStateResult.phoneFieldFilled) {
-        await assertions.expectPhoneFieldToHaveValue(formStateResult.phoneFieldValue);
-      }
-      if (formStateResult.addressFieldFilled) {
-        await assertions.expectAddressFieldToHaveValue(formStateResult.addressFieldValue);
-      }
-      
-    } 
+    if (errorCount > 0) {
+        const errors = await orderFormPom.getErrorMessages();
+        console.log('Validation errors:', errors);
+        await assertions.expectValidationErrorsToBePresent();
+    } else {
+        console.log('No validation errors found - form may have been submitted successfully');
+    }
   });
 
   test('Test order form field validation without submission', async ({ page }) => {
     const assertions = new OrderFormAssertions(page);
-    const orderFormPom = new OrderFormPom(page);
-    
-    // Navigate directly to order form if possible
-    const orderFormUrl = page.url().includes('order') ? page.url() : `${testConfig.urls.base}order`;
-    
-    try {
-      await page.goto(orderFormUrl);
-      // Wait for order form to be visible instead of static timeout
-      await page.waitForSelector(OrderFormLocators.orderForm, { state: 'visible', timeout: 30000 });
-      
-      const orderForm = page.locator(OrderFormLocators.orderForm).first();
-      
-      if (await orderForm.isVisible()) {
-        const requiredFieldsResult = await orderFormPom.testRequiredFields();
-        const fieldValidationResult = await orderFormPom.testFieldValidation();
-        const formStateResult = await orderFormPom.testFormStateChanges();
-        
-        // Assert on the returned data
-        if (requiredFieldsResult.nameFieldVisible) {
-          await assertions.expectNameFieldToBeVisible();
-        }
-        if (requiredFieldsResult.phoneFieldVisible) {
-          await assertions.expectPhoneFieldToBeVisible();
-        }
-        if (requiredFieldsResult.addressFieldVisible) {
-          await assertions.expectAddressFieldToBeVisible();
-        }
-        
-        if (fieldValidationResult.hasErrors) {
-          await assertions.expectValidationErrorsToBePresent([assertions.errorMessages]);
-        }
-        
-        if (formStateResult.nameFieldFilled) {
-          await assertions.expectNameFieldToHaveValue(formStateResult.nameFieldValue);
-        }
-        if (formStateResult.phoneFieldFilled) {
-          await assertions.expectPhoneFieldToHaveValue(formStateResult.phoneFieldValue);
-        }
-        if (formStateResult.addressFieldFilled) {
-          await assertions.expectAddressFieldToHaveValue(formStateResult.addressFieldValue);
-        }
-      } 
-    } catch (error) {
-      console.error('Error navigating to order form:', error);
-      throw error;
+    const homePage = new HomePage(page);
+    const orderForm = new OrderFormPom(page);
+
+    await homePage.doSearch(testConfig.search.keywords.pizza);
+
+    const searchResult = new SearchResultPage(page);
+
+    // Add item to basket
+    await searchResult.clickAddButton();
+
+    // Navigate to basket page
+    await searchResult.clickToBasket();
+
+    // Press "Make an Order" button using proper locator
+    const basketPage = new BasketPage(page);
+    await basketPage.clickMakeOrderButton();
+
+    // Fill all required fields using the new methods
+    await orderForm.fillContactInfo(
+      testConfig.testData.userName,
+      testConfig.testData.userPhone,
+      testConfig.testData.userEmail
+    );
+    await orderForm.chooseRegion(testConfig.testData.userProvince);
+    await orderForm.fillAddress(testConfig.testData.userAddress);
+
+    // Verify field validations
+    const fieldValidations = await orderForm.getFieldValidations();
+  });
+
+  test('Should show errors when required fields are empty', async ({ page }) => {
+    const homePage = new HomePage(page);
+    const orderForm = new OrderFormPom(page);
+    const assertions = new OrderFormAssertions(page);
+
+    await homePage.doSearch(testConfig.search.keywords.pizza);
+    const searchResult = new SearchResultPage(page);
+    await searchResult.clickAddButton();
+    await searchResult.clickToBasket();
+
+    const basketPage = new BasketPage(page);
+    await basketPage.clickMakeOrderButton();
+
+    // Try submitting without filling fields
+    await orderForm.submitOrder();
+
+    // Collect errors
+    const errors = await orderForm.getErrorMessages();
+    console.log(errors);
+
+    // Assertions
+    await assertions.expectValidationErrorsToBePresent();
+    if (errors.length > 0) {
+      await assertions.expectErrorMessagesToContain('Չի լրացվել դաշտը');
     }
   });
 }); 

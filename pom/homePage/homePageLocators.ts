@@ -6,7 +6,7 @@ export const HomePageLocators = {
     itemAddButton: '.button.add-cart-counter__btn',
     basketHome: '.cart-fixed-btn',
     itemTitle: '.product-preview__title',
-    itemPrice: '.product-preview__price-cur, .product-preview__price-range',
+    itemPrice: '.product-preview__price-cur',
     headerSearchField: 'header input[name="q"], .header__search-field',
     mainSearchField: 'input[name="q"], .search-form input',
     productGrid: '.product-grid, .products-grid',
@@ -16,5 +16,6 @@ export const HomePageLocators = {
     addToCartButton: '.add-cart-counter__btn, .buy-button',
     cartIcon: '.cart-fixed-btn, .shopping-cart',
     logo: '.header__logo, .site-logo',
-    basketCount: '.cart-count, .basket-count, .cart-counter, [data-cart-count]'
+    basketCount: '.cart-count, .basket-count, .cart-counter, [data-cart-count]',
+    basketQuantity: '[data-cart-positions-count]',
 }

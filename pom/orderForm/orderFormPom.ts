@@ -1,66 +1,69 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import { OrderFormLocators } from './orderFormLocators';
-import { HomePage } from '../homePage/homePagePom';
-import { SearchResultPage } from '../searchResultPage/searchResultPagePom';
-import { BasketPage } from '../basketPage/basketPagePom';
-import { testConfig } from '../../config/config';
 
 export class OrderFormPom {
-    readonly page: Page;
-    readonly nameField: Locator;
-    readonly phoneField: Locator;
-    readonly addressField: Locator;
-    readonly errorMessages: Locator;
+    constructor(private readonly page: Page) {}
 
-    constructor(page: Page) {
-        this.page = page;
-        this.nameField = page.locator(OrderFormLocators.nameField);
-        this.phoneField = page.locator(OrderFormLocators.phoneField);
-        this.addressField = page.locator(OrderFormLocators.addressField);
-        this.errorMessages = page.locator(OrderFormLocators.errorMessages);
+    private form = this.page.locator(OrderFormLocators.orderForm);
+
+    nameInput = this.form.locator(OrderFormLocators.nameField);
+    phoneInput = this.form.locator(OrderFormLocators.phoneField);
+    emailInput = this.form.locator(OrderFormLocators.emailField);
+    regionSelect = this.form.locator(OrderFormLocators.regionSelect);
+    addressInput = this.form.locator(OrderFormLocators.addressField);
+    submitOrderButton = this.form.locator(OrderFormLocators.submitOrderButton);
+    errorMessages = this.form.locator(OrderFormLocators.errorMessages);
+
+    async fillContactInfo(name: string, phone: string, email: string) {
+        await this.nameInput.fill(name);
+        await this.phoneInput.fill(phone);
+        await this.emailInput.fill(email);
+    }
+
+    async chooseRegion(region: string) {
+        await this.regionSelect.selectOption({ label: region });
+    }
+
+    async fillAddress(address: string) {
+        await this.addressInput.fill(address);
+    }
+
+    async getErrorMessages(): Promise<string[]> {
+        const count = await this.errorMessages.count();
+        const errors: string[] = [];
+        for (let i = 0; i < count; i++) {
+            errors.push((await this.errorMessages.nth(i).innerText()).trim());
+        }
+        return errors;
+    }
+
+    async submitOrder() {
+        await this.submitOrderButton.click();
     }
 
     async fillNameField(name: string) {
-        await this.nameField.fill(name);
+        await this.nameInput.fill(name);
     }
     
     async fillPhoneField(phone: string) {
-        await this.phoneField.fill(phone);
+        await this.phoneInput.fill(phone);
+    }
+    
+    async fillEmailField(email: string) {
+        await this.emailInput.fill(email);
+    }
+    
+    async fillProvinceField(province: string) {
+        await this.chooseRegion(province);
     }
 
     async fillAddressField(address: string) {
-        await this.addressField.fill(address);
-    }
-    
-    async getErrorMessages() {
-        return await this.errorMessages.allTextContents();
+        await this.addressInput.fill(address);
     }
 
-    async testRequiredFields() {
-        return {
-            nameFieldVisible: await this.nameField.isVisible(),
-            phoneFieldVisible: await this.phoneField.isVisible(),
-            addressFieldVisible: await this.addressField.isVisible()
-        };
-    }
-
-    async testFieldValidation() {
+    async getFieldValidations() {
         return {
             hasErrors: await this.errorMessages.count() > 0
         };
     }
-
-    async testFormStateChanges() {
-        return {
-            nameFieldFilled: await this.nameField.inputValue() !== '',
-            nameFieldValue: await this.nameField.inputValue(),
-            phoneFieldFilled: await this.phoneField.inputValue() !== '',
-            phoneFieldValue: await this.phoneField.inputValue(),
-            addressFieldFilled: await this.addressField.inputValue() !== '',
-            addressFieldValue: await this.addressField.inputValue()
-        };
-    }
-
-
-
 } 

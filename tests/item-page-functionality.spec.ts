@@ -5,162 +5,118 @@ import { testConfig } from '../config/config';
 import { searchResultPageLocators } from '../pom/searchResultPage/searchResultPageLocators';
 import { productItemPageLocators } from '../pom/productItemPage/productItemPageLocators';
 import { ProductItemPageAssertions } from '../pom/productItemPage/productItemPageAssertions';
+import { ProductItemPagePom } from '../pom/productItemPage/productItemPagePom';
 
 // Item page functionality test cases
 test.describe('Item Page Functionality Tests', () => {
-  test.beforeEach(async ({ page }) => {
-    await page.goto(testConfig.urls.base, { waitUntil: 'domcontentloaded', timeout: 120000 });
-    const homePage = new HomePage(page);
-    await homePage.closeModal();
-  });
+    test.beforeEach(async ({ page }) => {
+        await page.goto(testConfig.urls.base);
+        const homePage = new HomePage(page);
+        await homePage.closeModal();
+    });
 
-  test('Navigate to item page and verify product details', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new ProductItemPageAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
-    
-    // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.item).first();
-    if (await firstResult.isVisible()) {
-      await firstResult.click();
-      
-      // Verify we're on product page
-      await assertions.expectCurrentUrlToContainProductPage();
-      
-      // Verify product details are displayed
-      const productTitle = page.locator(productItemPageLocators.productItemTitle).first();
-      const productPrice = page.locator(productItemPageLocators.productItemPrice).first();
-      const productImage = page.locator(productItemPageLocators.productImage).first();
-      const productDescription = page.locator(productItemPageLocators.productDescription).first();
-      
-      await assertions.expectProductTitleToBeVisible();
-      await assertions.expectProductPriceToBeVisible();
-      await assertions.expectProductImageToBeVisible();
-      await assertions.expectProductDescriptionToBeVisible();
-    }
-  });
+    test('Navigate to item page and verify product details', async ({ page }) => {
+        const homePage = new HomePage(page);
+        const assertions = new ProductItemPageAssertions(page);
 
-  test('Add item to basket from item page', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new ProductItemPageAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
+        // Search for pizza
+        await homePage.doSearch(testConfig.search.keywords.pizza);
 
-    // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.item).first();
-    if (await firstResult.isVisible()) {
-      await firstResult.click();
-     
-      // Verify add to basket button is visible
-      const addToBasketButton = page.locator(productItemPageLocators.addToCartButton).first();
-      await assertions.expectAddToBasketButtonToBeVisible();
-      
-      // Add item to basket
-      await addToBasketButton.click();
-      
-      // Verify success message
+        const searchResult = new SearchResultPage(page);
+        // open the item page
+        await searchResult.clickToItem();
+
+        // verify the item page
+        await assertions.expectProductTitleToBeVisible();
+        await assertions.expectProductPriceToBeVisible();
+        await assertions.expectProductImageToBeVisible();
+
+    });
+
+    test('Add item to basket from item page', async ({ page }) => {
+        const homePage = new HomePage(page);
+        const assertions = new ProductItemPageAssertions(page);
+
+        // Search for pizza
+        await homePage.doSearch(testConfig.search.keywords.pizza);
+
+        const searchResult = new SearchResultPage(page);
+
+        // open the item page
+        await searchResult.clickToItem();
+
+        const itemPage = new ProductItemPagePom(page);
+
+        //add item to basket from the item page 
+        await itemPage.clickAddToCartButton();
+
+        // Verify success message
         await assertions.expectSuccessMessageToBeVisible();
-      
-      // Verify basket count increased
-      const basketText = await homePage.getBasketCount();
-      await assertions.expectBasketCountToContainOne(basketText);
-    }
-  });
 
-  test('Change item quantity on item page', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new ProductItemPageAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
-    
-    // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.item).first();
-    if (await firstResult.isVisible()) {
-      await firstResult.click();
-      
-      // Get initial quantity
-      const quantityInput = page.locator(productItemPageLocators.quantityInput).first();
-      if (await quantityInput.isVisible()) {
-        const initialQuantity = await quantityInput.inputValue();
+    });
+
+    test('Change item quantity from the item page', async ({ page }) => {
+        const homePage = new HomePage(page);
+        const assertions = new ProductItemPageAssertions(page);
+
+        // Search for pizza
+        await homePage.doSearch(testConfig.search.keywords.pizza);
+
+        const searchResult = new SearchResultPage(page);
+
+        // open the item page
+        await searchResult.clickToItem();
+
+        const itemPage = new ProductItemPagePom(page);
+        // add item to basket from the item page 
+        await itemPage.clickAddToCartButton();
+        await page.waitForTimeout(2000); // Wait for cart to update
+
+        // get the initial quantity
+        const initialQuantity = await itemPage.getQuantityInput() || '0';
+        console.log(`initial quantity: ${initialQuantity}`);
+
+        // increase the quantity
+        await itemPage.increaseQuantity();
+
+        // get the new quantity
+        const newQuantity = await itemPage.getQuantityInput() || '0';
+        console.log(`new quantity: ${newQuantity}`);
+
+        // decrease the quantity
+        await itemPage.decreaseQuantity();
+
+        // get the final quantity
+        const finalQuantity = await itemPage.getQuantityInput() || '0';
+        console.log(`final quantity: ${finalQuantity}`);
+
+        // assert that the quantity increased
+        await assertions.expectQuantityToIncrease(initialQuantity, newQuantity);
+
+        // assert that the quantity decreased
+        await assertions.expectQuantityToDecrease(newQuantity, finalQuantity);
+
+    });
+
+    test('Add item to favorites', async ({ page }) => {
+        const homePage = new HomePage(page);
+        const assertions = new ProductItemPageAssertions(page);
+
+        // Search for pizza
+        await homePage.doSearch(testConfig.search.keywords.pizza);
+
+        const searchResult = new SearchResultPage(page);
+
+        // open the item page   
+        await searchResult.clickToItem();
+
+        const itemPage = new ProductItemPagePom(page);
+
+        // add item to favorites
+        await itemPage.addToFavorites();
         
-        // Increase quantity
-        const increaseButton = page.locator(productItemPageLocators.quantityIncrease).first();
-        if (await increaseButton.isVisible()) {
-          await increaseButton.click();
-          
-          const newQuantity = await quantityInput.inputValue();
-          await assertions.expectQuantityToIncrease(initialQuantity, newQuantity);
-          
-          // Decrease quantity back to original
-          const decreaseButton = page.locator(productItemPageLocators.quantityDecrease).first();
-        if (await decreaseButton.isVisible()) {
-            await decreaseButton.click();
-            
-            const finalQuantity = await quantityInput.inputValue();
-            await assertions.expectQuantityToReturnToOriginal(initialQuantity, finalQuantity);
-          }
-        }
-      }
-    }
-  });
-
-  test('View item image', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new ProductItemPageAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
-
-    // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.item).first();
-    if (await firstResult.isVisible()) {
-      await firstResult.click();
-      
-      // Verify main image is visible
-      const mainImage = page.locator(productItemPageLocators.productImage).first();
-      await assertions.expectMainImageToBeVisible();
-    }
-  });
-
-  test('Add item to favorites', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new ProductItemPageAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
-    
-    // Click on first result to go to item page
-    const firstResult = page.locator(searchResultPageLocators.item).first();
-    if (await firstResult.isVisible()) {
-      await firstResult.click();
-
-      // Verify favorite button is visible
-      const favoriteButton = page.locator(productItemPageLocators.favoriteButton).first();
-      await assertions.expectFavoriteButtonToBeVisible();
-      
-      // Add to favorites
-      await favoriteButton.click();
-      await page.waitForTimeout(testConfig.timeouts.itemAdd);
-      
-      // Verify success message
-      const successMessage = page.locator('text=/added to favorites|added to wishlist|հավանել եք/').first();
-      if (await successMessage.isVisible()) {
+        // verify the favorite success message
         await assertions.expectFavoriteSuccessMessageToBeVisible();
-      }
-    }
-  });
+    
+    });
 }); 

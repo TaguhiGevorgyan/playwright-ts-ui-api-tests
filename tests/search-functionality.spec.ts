@@ -25,6 +25,7 @@ test.describe('Search Functionality Tests', () => {
     
     // Get first result title
     const firstResultTitle = await searchResult.getTitle();
+    console.log('First result title:', firstResultTitle);
     
     // Verify search results contain keyword (case-insensitive)
     await assertions.expectSearchResultTitleToContainKeywordCaseInsensitive(firstResultTitle, testConfig.search.keywords.pizza);
@@ -40,13 +41,12 @@ test.describe('Search Functionality Tests', () => {
     const searchResult = new SearchResultPage(page);
   
     // Check for no results message and verify count
-    const { hasNoResultsMessage, resultCount } = await searchResult.verifyNoResultsAndCount();
-    
-    if (hasNoResultsMessage) {
+    const resultCount = await searchResult.getResultCount();
       const noResultsMessage = await searchResult.getNoResultsMessage();
+      console.log(`No Results Message ${noResultsMessage}`);
       await assertions.expectNoResultsMessageToBeVisible(noResultsMessage);
-    }
-    
+  
+    console.log(`Result Count ${resultCount}`);
     await assertions.expectResultCountToBeZero(resultCount);
   });
 
@@ -56,6 +56,7 @@ test.describe('Search Functionality Tests', () => {
     
     // Get search field placeholder
     const placeholder = await homePage.getSearchFieldPlaceholder();
+    console.log(`Placeholder ${placeholder}`);
     if (placeholder) {
       await assertions.expectSearchFieldPlaceholderToContainKeyword(placeholder, testConfig.search.keywords.fieldPlaceholder);
     }
@@ -78,13 +79,13 @@ test.describe('Search Functionality Tests', () => {
     await searchButton.click();
     // Check for no results message and verify count
     const searchResult = new SearchResultPage(page);
-    const searchPageAssertions = new SearchResultPageAssertions(page);
-    const { hasNoResultsMessage, resultCount } = await searchResult.verifyNoResultsAndCount();
-    if (hasNoResultsMessage) {
-      const noResultsMessage = await searchResult.getNoResultsMessage();
-      await searchPageAssertions.expectNoResultsMessageToBeVisible(noResultsMessage);
-    }
-    await searchPageAssertions.expectResultCountToBeZero(resultCount);
+    const searchResultAssertions = new SearchResultPageAssertions(page);
+    const resultCount = await searchResult.getResultCount();
+    const noResultsMessage = await searchResult.getNoResultsMessage();
+    console.log(`No Results Message ${noResultsMessage}`);
+    await searchResultAssertions.expectNoResultsMessageToBeVisible(noResultsMessage);
+
+  console.log(`Result Count ${resultCount}`);
+  await searchResultAssertions.expectResultCountToBeZero(resultCount);
   });
-      
-}); 
+});   

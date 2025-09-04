@@ -1,10 +1,10 @@
 export const OrderFormLocators = {
-  orderForm: 'form, .order-form',
-  nameField: '.name-field, .customer-name',
-  phoneField: '.phone-field, .customer-phone',
-  addressField: '.address-field, .customer-address',
-  submitButton: '.submit-btn, .confirm-btn, .order-submit',
-  errorMessages: '.error-message, .validation-error',
-  checkoutButton: '.checkout-button, .order-button,',
-  confirmationMessage: '.confirmation-message, .order-confirmed'
+  orderForm: '#order_form',
+  nameField: '#client_contact_name',
+  phoneField: '#client_phone',
+  emailField: '#client_email',
+  regionSelect: 'select[name="shipping_address[fields_values_attributes][37134020][value]"]',
+  addressField: '#shipping_address_field_37136836',
+  submitOrderButton: '#create_order',
+  errorMessages: '.co-input-notice.co-notice--danger'
 }; 

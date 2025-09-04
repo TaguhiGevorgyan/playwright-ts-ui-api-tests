@@ -6,12 +6,18 @@ import { HomePageLocators } from './homePageLocators';
     readonly ModalCloseButton: Locator;
     readonly searchField: Locator;
     readonly searchFieldButton: Locator;
+    readonly basketCount: Locator;
+    readonly productContainer: Locator;
+    readonly basketButton: Locator;
 
   constructor(page: Page) {
     super(page);
     this.searchField = page.locator(HomePageLocators.searchField);
     this.searchFieldButton = page.locator(HomePageLocators.searchFieldButton);
     this.ModalCloseButton = page.locator(HomePageLocators.modalCloseButton);
+    this.basketCount = page.locator(HomePageLocators.basketCount);
+    this.productContainer = page.locator(HomePageLocators.itemInHomePage);
+    this.basketButton = page.locator(HomePageLocators.basketHome);
   }
 
   async closeModal() {
@@ -24,28 +30,27 @@ import { HomePageLocators } from './homePageLocators';
     
   }
   async getSearchFieldPlaceholder(): Promise<string | null> {
-    const searchField = this.page.locator(HomePageLocators.searchField).first();
+    const searchField = this.searchField.first();
     if (await searchField.isVisible()) {
       return await searchField.getAttribute('placeholder');
     }
     return null;
   }
 
-  async addAnItem(): Promise<void> {
-    const addButton = this.page.locator(HomePageLocators.itemAddButton).first();
-    await addButton.click();
-  }
 
+  async FindAnItem(){
+    // Wait for the product container to be visible
+    const productContainer = this.productContainer.first();
+    await productContainer.waitFor({ state: 'visible' });
+}
   async clickToBasketHome(): Promise<void> {
-    const basketButton = this.page.locator(HomePageLocators.basketHome).first();
+    const basketButton = this.basketButton.first();
     await basketButton.click();
   }
 
   async getBasketCount(): Promise<string> {
-    const basketCount = this.page.locator(HomePageLocators.basketCount).first();
-    if (await basketCount.isVisible()) {
-      return await basketCount.textContent() || '';
-    }
-    return '';
+    const basketCount = this.basketCount.first();
+    return await basketCount.textContent() || '0';
   }
+
 }

@@ -8,8 +8,9 @@ export class BasketPage {
     readonly basketItemTitle: Locator;
     readonly basketItemPrice: Locator;
     readonly basketItemQuantity: Locator;
-    readonly basketItemTotalPrice: Locator;
+    readonly basketTotalPrice: Locator;
     readonly basketEmptyMessage: Locator;
+
 
     constructor(page: Page) {
         this.page = page;
@@ -17,26 +18,32 @@ export class BasketPage {
         this.basketItemTitle = page.locator(BasketPageLocators.basketItemTitle);
         this.basketItemPrice = page.locator(BasketPageLocators.basketItemPrice);
         this.basketItemQuantity = page.locator(BasketPageLocators.itemCounter);
-        this.basketItemTotalPrice = page.locator(BasketPageLocators.totalPrice);
+        this.basketTotalPrice = page.locator(BasketPageLocators.totalPrice);
         this.basketEmptyMessage = page.locator(BasketPageLocators.basketEmptyMessage);
+        
     }
 
     async getBasketItemTitle(): Promise<string> {
+        // Wait for basket page to load
+        await this.page.waitForTimeout, { timeout: 2000 };
         return await this.basketItemTitle.textContent() || '';
     }
 
     async getBasketItemPrice(): Promise<string> {
-        return await this.basketItemPrice.textContent() || '';
+        const firstPrice = this.basketItemPrice.first();
+        return await firstPrice.textContent() || '';
     }
 
     async getBasketItemQuantity(): Promise<string> {
         return await this.basketItemQuantity.textContent() || '';
     }
 
-    async getBasketItemTotalPrice(): Promise<string> {
-        return await this.basketItemTotalPrice.textContent() || '';
+    async getTotalPrice(): Promise<string> {
+        const totalPrice = this.basketTotalPrice.first();
+        await totalPrice.waitFor(); // wait until visible in DOM
+        const text = await totalPrice.textContent();
+        return text?.trim() || '';
     }
-
     async getBasketEmptyMessage(): Promise<string> {
         return await this.basketEmptyMessage.textContent() || '';
     }
@@ -54,10 +61,7 @@ export class BasketPage {
         return await this.getBasketItemQuantity();
     }
 
-    async getTotalPrice(): Promise<string> {
-        return await this.getBasketItemTotalPrice();
-    }
-
+   
     async getSecondItemTitle(): Promise<string> {
         const secondItemTitle = this.basketItemTitle.nth(1);
         return await secondItemTitle.textContent() || '';
@@ -73,22 +77,28 @@ export class BasketPage {
         await increaseButton.click();
     }
 
-    async clickOnItem(): Promise<void> {
+    async clickOnItem() {
         const itemLink = this.basketItemTitle.first();
+        const itemLinkText = await itemLink.textContent();
+        console.log(`Item link text: ${itemLinkText}`);
+        await itemLink.waitFor({ state: 'visible' });
         await itemLink.click();
     }
 
+    async deleteItem(){
+        const deleteButton = this.page.locator(BasketPageLocators.removeItemButton).first();
+        if (await deleteButton.isVisible()) {
+            await deleteButton.click();
+            await this.page.waitForTimeout(1000);
+        }
+    }
     async deleteAllItems(): Promise<void> {
         const deleteButtons = this.page.locator(BasketPageLocators.removeItemButton);
-        const deleteCount = await deleteButtons.count();
-        
-        for (let i = 0; i < deleteCount; i++) {
-            const deleteButton = deleteButtons.nth(i);
-            if (await deleteButton.isVisible()) {
-                await deleteButton.click();
-                // Wait for item removal
-                await this.page.waitForTimeout(2000);
-            }
+    
+        while (await deleteButtons.count() > 0) {
+            const firstButton = deleteButtons.first();
+            await firstButton.click();
+           await this.page.waitForTimeout(1000);
         }
     }
 
@@ -98,4 +108,5 @@ export class BasketPage {
             await makeOrderButton.click();
         }
     }
+    
 }

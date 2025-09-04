@@ -117,15 +117,52 @@ export class BasketAssertions {
       const initialTotal = Number(initialTotalPrice.replace(/[^\d]/g, ''));
       const newTotal = Number(newTotalPrice.replace(/[^\d]/g, ''));
       console.log(`Initial total: ${initialTotal}, New total: ${newTotal}`);
-      
-      if (newTotal > initialTotal) {
-        console.log(`Total price increased from ${initialTotal} to ${newTotal}`);
         expect(newTotal).toBeGreaterThan(initialTotal);
-      } else {
-        console.log(`Total price did not increase as expected`);
-        // Still pass the test but log the issue
-        expect(newTotal).toBeGreaterThanOrEqual(initialTotal);
-      }
     }
+  }
+  async expectTotalPriceToDecrease(initialTotalPrice: string, newTotalPrice: string) {
+    if (initialTotalPrice && newTotalPrice) {
+      const initialTotal = Number(initialTotalPrice.replace(/[^\d]/g, ''));
+      const newTotal = Number(newTotalPrice.replace(/[^\d]/g, ''));
+      console.log(`Initial total: ${initialTotal}, New total: ${newTotal}`);
+      expect(newTotal).toBeLessThan(initialTotal);
+    }
+  }
+  async expectTotalPriceToEqualSumOfItems(itemPrices: string[], totalPrice: string) {
+    // Calculate sum of individual item prices
+    const sumOfItems = itemPrices.reduce((sum, price) => {
+      const numericPrice = Number(price.replace(/[^\d]/g, ''));
+      return sum + numericPrice;
+    }, 0);
+    
+    // Extract numeric value from total price
+    const totalValue = Number(totalPrice.replace(/[^\d]/g, ''));
+    
+    // Assert that total equals sum of items
+    expect(totalValue).toBe(sumOfItems);
+    console.log(`Total price: ${totalValue}, Sum of items: ${sumOfItems}`);
+  }
+  async expectBasketQuantityToIncrease(initialQuantity: string, newQuantity: string) {
+    const initial = Number(initialQuantity.replace(/[^\d]/g, ''));
+    const newQty = Number(newQuantity.replace(/[^\d]/g, ''));
+    expect(newQty).toBeGreaterThan(initial);
+  }
+  async verifyTotalPrice(): Promise<{ isValid: boolean; totalPrice: string }> {
+    const totalPrice = await this.basketItemTotalPrice.textContent();
+    
+    if (totalPrice && totalPrice.trim() !== '') {
+        const totalValue = Number(totalPrice.replace(/[^\d]/g, ''));
+        const isValid = totalValue > 0;
+        console.log(`Total price verified: ${totalPrice}`);
+        return { isValid, totalPrice };
+    } else {
+        console.log(`Total price not found`);
+        return { isValid: false, totalPrice: '' };
+    }
+}
+//method for verify that the item is in the basket
+async verifyItemInBasket(itemTitle: string): Promise<boolean> {
+    const itemTitleText = await this.basketItemTitle.textContent();
+    return itemTitleText?.trim() === itemTitle.trim();
   }
 }

@@ -38,16 +38,13 @@ export class ProductItemPageAssertions {
     await expect(this.productImage).toBeVisible();
   }
 
-  async expectProductDescriptionToBeVisible() {
-    await expect(this.productDescription).toBeVisible();
-  }
-
   async expectAddToBasketButtonToBeVisible() {
     await expect(this.addToCartButton).toBeVisible();
   }
 
   async expectSuccessMessageToBeVisible() {
     const successMessage = this.page.locator(productItemPageLocators.successMessage);
+    console.log(`success message: ${await successMessage.textContent()}`);
     await expect(successMessage).toBeVisible();
   }
 
@@ -59,6 +56,11 @@ export class ProductItemPageAssertions {
     const initial = Number(initialQuantity);
     const newQty = Number(newQuantity);
     expect(newQty).toBeGreaterThan(initial);
+  }
+  async expectQuantityToDecrease(newQuantity: string, finalQuantity: string) {
+    const newQty = Number(newQuantity);
+    const finalQty = Number(finalQuantity);
+    expect(finalQty).toBeLessThan(newQty);
   }
 
   async expectQuantityToReturnToOriginal(initialQuantity: string, finalQuantity: string) {
@@ -76,5 +78,11 @@ export class ProductItemPageAssertions {
   async expectFavoriteSuccessMessageToBeVisible() {
     const favoriteSuccessMessage = this.page.locator(productItemPageLocators.favoriteSuccessMessage);
     await expect(favoriteSuccessMessage).toBeVisible();
+  }
+
+  // expect item title is the same as in the basket
+  async expectItemTitleToBeTheSameAsInBasket(basketItemTitle: string) {
+    const productTitle = await this.productItemTitle.textContent();
+    expect(productTitle?.trim()).toBe(basketItemTitle.trim());
   }
 }

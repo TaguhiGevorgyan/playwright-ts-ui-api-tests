@@ -32,4 +32,8 @@ export class HomePageAssertions {
   async expectSearchResultTitleToContainKeywordCaseInsensitive(title: string, keyword: string) {
     expect(title.toLowerCase()).toContain(keyword.toLowerCase());
   }
+  async expectBasketCountToBeGreaterThanZero(quantity: string): Promise<void> {
+    const quantityNumber = Number(quantity.replace(/[^\d]/g, ''));
+    expect(quantityNumber).toBeGreaterThan(0);
+  }
 }

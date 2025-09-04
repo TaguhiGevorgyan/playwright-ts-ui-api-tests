@@ -1,9 +1,9 @@
 export const searchResultPageLocators = {
-    item: '.product-preview__photo-variant, .product-preview__title',
+    item: '.product-preview__content',
     itemTitle: '.product-preview__title',
-    itemPrice: '.product-preview__price-cur, .product-preview__price-range',
-    addButton: '.add-cart-counter__btn, .button:has-text("Ավելացնել")',
+    itemPrice: '.product-preview__price-cur',
+    addButton: '.button.add-cart-counter__btn',
     basket: '.cart-fixed-btn',
     logo: 'role=banner >> role=link[name="Sushi Mushi"]',
-    noResultsMessage: '.no-results, .no-search-results'
+    noResultsMessage: '.empty-catalog-message'
 }

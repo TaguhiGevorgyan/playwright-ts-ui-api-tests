@@ -5,7 +5,12 @@ import { searchResultPageLocators } from './searchResultPageLocators';
 export class SearchResultPageAssertions {
   constructor(private page: Page) {}
 
-  async expectNoResultsMessageToBeVisible(locator: Locator) {
+  async expectNoResultsMessageToBeVisible(message: string) {
+    expect(message).toBeTruthy();
+    expect(message.length).toBeGreaterThan(0);
+  }
+
+  async expectNoResultsMessageLocatorToBeVisible(locator: Locator) {
     await expect(locator).toBeVisible();
   }
 

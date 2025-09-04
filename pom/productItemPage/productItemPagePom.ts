@@ -9,6 +9,9 @@ export class ProductItemPagePom {
     readonly productDescription: Locator;
     readonly addToCartButton: Locator;
     readonly favoriteButton: Locator;
+    readonly quantityInput: Locator;
+    readonly quantityIncrease: Locator;
+    readonly quantityDecrease: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -18,6 +21,9 @@ export class ProductItemPagePom {
         this.productDescription = page.locator(productItemPageLocators.productDescription);
         this.addToCartButton = page.locator(productItemPageLocators.addToCartButton);
         this.favoriteButton = page.locator(productItemPageLocators.favoriteButton);
+        this.quantityInput = page.locator(productItemPageLocators.quantityInput);
+        this.quantityIncrease = page.locator(productItemPageLocators.quantityIncrease);
+        this.quantityDecrease = page.locator(productItemPageLocators.quantityDecrease);
     }
 
     async clickAddToCartButton() {
@@ -42,5 +48,20 @@ export class ProductItemPagePom {
 
     async getProductDescription() {
         return await this.productDescription.textContent();
+    }
+
+    async getQuantityInput() {
+        return await this.quantityInput.textContent();
+    }
+
+    async increaseQuantity() {    
+        await this.quantityIncrease.click();
+    }
+
+    async decreaseQuantity() {
+        await this.quantityDecrease.click();
+    }
+    async addToFavorites() {
+        await this.favoriteButton.click();
     }
 }
