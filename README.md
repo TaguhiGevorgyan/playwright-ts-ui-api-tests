@@ -1,105 +1,6 @@
 # Sushi Mushi Playwright Test Suite
 
-This repository contains comprehensive Playwright tests for the Sushi Mushi website.
-
-##  Quick Start
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-
-### Installation
-```bash
-npm install
-```
-
-### Running Tests
-```bash
-# Run all tests
-npx playwright test
-
-# Run tests in headed mode
-npx playwright test --headed
-
-# Run specific test file
-npx playwright test tests/tests.spec.ts
-
-# Run tests with debug
-PWDEBUG=1 npx playwright test
-```
-
-##  Environment Configuration
-
-This project uses environment variables for configuration management. This approach provides several benefits:
-
-- **Environment-specific settings**: Different configs for dev, staging, production
-- **Security**: Sensitive data not committed to version control
-- **Flexibility**: Easy to change settings without code modifications
-- **Team collaboration**: Developers can have different local settings
-
-### Setup Environment Variables
-
-1. **Copy the example file**:
-   ```bash
-   cp config.env.example config.env
-   ```
-
-2. **Edit `config.env`** with your specific values:
-   ```bash
-   # Base URLs
-   BASE_URL=https://sushimushi.am/
-   HOMEPAGE_URL=sushimushi.am
-   
-   # Timeouts (in milliseconds)
-   SEARCH_RESULTS_TIMEOUT=2000
-   PAGE_LOAD_TIMEOUT=2000
-   
-   # Test Data
-   TEST_USER_NAME=Your Test User
-   TEST_USER_PHONE=+37412345678
-   ```
-
-3. **Never commit `config.env`** - it's already in `.gitignore`
-
-### Environment Variables Structure
-
-The configuration is organized into logical sections:
-
-#### URLs
-```bash
-BASE_URL=https://sushimushi.am/
-HOMEPAGE_URL=sushimushi.am
-PRODUCT_PAGE_URL=sushimushi.am
-```
-
-#### Timeouts
-```bash
-SEARCH_RESULTS_TIMEOUT=2000
-PAGE_LOAD_TIMEOUT=2000
-ITEM_ADD_TIMEOUT=1000
-BASKET_NAVIGATION_TIMEOUT=2000
-FORM_FILL_TIMEOUT=1000
-```
-
-#### Search Keywords
-```bash
-SEARCH_KEYWORD_PIZZA=պիցցա
-SEARCH_KEYWORD_SUSHI=սուշի
-SEARCH_KEYWORD_TUNA_PIZZA=թունա պիցցա
-```
-
-#### Test Data
-```bash
-TEST_USER_NAME=Test User
-TEST_USER_PHONE=+37412345678
-TEST_USER_ADDRESS=Test Address
-```
-
-#### Locators
-```bash
-CSS_BASKET_ICON=.cart-fixed-btn,.cart-icon,.basket-icon
-CSS_ERROR_MESSAGE=.error-message,.validation-error,.required-field-error
-```
+This repository contains comprehensive Playwright tests for the Sushi Mushi website, featuring a robust Page Object Model (POM) architecture with TypeScript support
 
 ## 📁 Project Structure
 
@@ -108,34 +9,101 @@ sushiTest/
 ├── config/
 │   ├── config.ts          # Configuration loader and types
 │   └── config.env.example # Example environment file
-├── pom/                   # Page Object Models
-│   ├── homePage/
-│   ├── searchResultPage/
-│   └── basketPage/
-├── tests/
-│   └── tests.spec.ts      # Main test suite
+├── pom/                   # Page Object Models (POM)
+│   ├── basePage.ts        # Base page class
+│   ├── homePage/          # Home page POM
+│   │   ├── homePagePom.ts
+│   │   ├── homePageLocators.ts
+│   │   └── homePageAssertions.ts
+│   ├── searchResultPage/  # Search results POM
+│   │   ├── searchResultPagePom.ts
+│   │   ├── searchResultPageLocators.ts
+│   │   └── searchResultPageAssertions.ts
+│   ├── basketPage/        # Shopping basket POM
+│   │   ├── basketPagePom.ts
+│   │   ├── basketPageLocators.ts
+│   │   └── basketPageAssertions.ts
+│   ├── orderForm/         # Order form POM
+│   │   ├── orderFormPom.ts
+│   │   ├── orderFormLocators.ts
+│   │   └── orderFormAssertions.ts
+│   └── productItemPage/   # Product page POM
+│       ├── productItemPagePom.ts
+│       ├── productItemPageLocators.ts
+│       └── productItemPageAssertions.ts
+├── tests/                 # Test suites
+│   ├── api-tests.spec.ts
+│   ├── basket-functionality.spec.ts
+│   ├── item-page-functionality.spec.ts
+│   ├── order-form-validation.spec.ts
+│   └── search-functionality.spec.ts
 ├── config.env             # Your local environment file (not committed)
 ├── .gitignore            # Git ignore rules
 └── README.md             # This file
 ```
 
-## 🧪 Test Categories
+## Test Categories
 
-### 1. Basic Basket Functionality
-- Add item to basket and compare price/title
+### 1. API Tests (`api-tests.spec.ts`)
+- Mock API responses for products and search
+- API endpoint validation
+- Response time testing
+
+### 2. Search Functionality (`search-functionality.spec.ts`)
+- Search for existing products (pizza, sushi)
+- Search with non-existent items
+- Search field placeholder validation
+- Empty search validation
+- Multi-language search support (Armenian)
+
+### 3. Basket Functionality (`basket-functionality.spec.ts`)
+- Add single item to basket and verify details
 - Add multiple items and verify totals
+- Item quantity management (increase/decrease)
+- Item removal and basket clearing
+- Navigation between basket and product pages
+- Price calculation validation
 
-### 2. Search Functionality
-- Search for existing products
-- Search with special characters
-- Search performance testing
-- Multi-language search support
+### 4. Order Form Validation (`order-form-validation.spec.ts`)
+- Form field validation without submission
+- Required field validation with error messages
+- Contact information filling (name, phone, email)
+- Address and region selection
+- Armenian language support for validation messages
 
-### 3. Comprehensive Basket Operations
-- Item quantity management
-- Item removal
-- Basket clearing
-- Order confirmation flow
+### 5. Item Page Functionality (`item-page-functionality.spec.ts`)
+- Add items to basket from product pages
+- Quantity changes on product pages
+- Success message validation
+- Favorite functionality testing
+
+##  Page Object Model (POM) Architecture
+
+### POM Structure
+Each page has three main components:
+- **`*Pom.ts`**: Main page interactions and methods
+- **`*Locators.ts`**: CSS selectors and locators
+- **`*Assertions.ts`**: Test assertions and validations
+
+### POM Best Practices
+- **Consistent Constructor Pattern**: All POM classes use explicit constructors with locator initialization
+- **Single Responsibility**: Each POM handles one specific page/component
+- **Reusable Methods**: Common actions are abstracted into reusable methods
+- **Type Safety**: Full TypeScript support with proper typing
+- **Error Handling**: Robust error handling with meaningful error messages
+
+### Example POM Usage
+```typescript
+// Initialize POM
+const homePage = new HomePage(page);
+const searchResult = new SearchResultPage(page);
+const basketPage = new BasketPage(page);
+
+// Use POM methods
+await homePage.doSearch('պիցցա');
+await searchResult.clickAddButton();
+await basketPage.verifyItemInBasket();
+```
 
 ## 🔄 Using Configuration in Tests
 
@@ -220,6 +188,18 @@ SEARCH_RESULTS_TIMEOUT=2000
 - Restart your terminal/IDE after creating `config.env`
 - Verify the file is in the correct location
 - Check for typos in variable names
+
+### Test Failures
+- **Strict Mode Violations**: Use `.first()` when locators return multiple elements
+- **Timeout Issues**: Increase timeout values in `config.env` or add explicit waits
+- **Element Not Found**: Check if locators are still valid after UI changes
+- **Armenian Text Issues**: Ensure proper encoding and font support
+
+### Common Playwright Issues
+- **Browser Not Starting**: Run `npx playwright install` to install browsers
+- **Headless Mode Issues**: Use `--headed` flag to debug visually
+- **Slow Tests**: Check network conditions and increase timeouts
+- **Flaky Tests**: Add proper waits and retry mechanisms
 
 ##  Contributing
 
