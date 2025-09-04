@@ -36,14 +36,11 @@ import { HomePageLocators } from './homePageLocators';
     }
     return null;
   }
-
-
   async FindAnItem(){
-    // Wait for the product container to be visible
     const productContainer = this.productContainer.first();
     await productContainer.waitFor({ state: 'visible' });
 }
-  async clickToBasketHome(): Promise<void> {
+  async clickToBasketHome() {
     const basketButton = this.basketButton.first();
     await basketButton.click();
   }

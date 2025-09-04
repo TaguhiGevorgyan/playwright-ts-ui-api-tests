@@ -2,16 +2,34 @@ import { Page, Locator } from '@playwright/test';
 import { searchResultPageLocators } from './searchResultPageLocators';
 
 export class SearchResultPage {
-  constructor(private page: Page) { }
+  readonly page: Page;
+  readonly itemTitle: Locator;
+  readonly itemPrice: Locator;
+  readonly item: Locator;
+  readonly addButton: Locator;
+  readonly basket: Locator;
+  readonly logo: Locator;
+  readonly noResultsMessage: Locator;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.itemTitle = page.locator(searchResultPageLocators.itemTitle);
+    this.itemPrice = page.locator(searchResultPageLocators.itemPrice);
+    this.item = page.locator(searchResultPageLocators.item);
+    this.addButton = page.locator(searchResultPageLocators.addButton);
+    this.basket = page.locator(searchResultPageLocators.basket);
+    this.logo = page.locator(searchResultPageLocators.logo);
+    this.noResultsMessage = page.locator(searchResultPageLocators.noResultsMessage);
+  }
 
   async getTitle(): Promise<string> {
-    const titleLocator = this.page.locator(searchResultPageLocators.itemTitle).first();
+    const titleLocator = this.itemTitle.first();
     return await titleLocator.textContent() || '';
   }
 
   async getPrice(): Promise<string> {
       await this.page.waitForSelector(searchResultPageLocators.itemPrice, { state: 'visible', timeout: 10000 });
-      const priceLocator = this.page.locator(searchResultPageLocators.itemPrice).first();
+      const priceLocator = this.itemPrice.first();
       const price = await priceLocator.textContent() || '';
       return price;
     }
@@ -19,7 +37,7 @@ export class SearchResultPage {
   async clickAddButton() {
     try {
       await this.page.waitForSelector(searchResultPageLocators.item, { state: 'visible', timeout: 10000 });
-      const addButton = this.page.locator(searchResultPageLocators.addButton).first();
+      const addButton = this.addButton.first();
       
       // Wait for button to be visible and attached
       await addButton.waitFor({ state: 'visible', timeout: 10000 });
@@ -50,32 +68,25 @@ export class SearchResultPage {
   }
 
   async clickToBasket(): Promise<void> {
-    const basketButton = this.page.locator(searchResultPageLocators.basket).first();
+    const basketButton = this.basket.first();
     await basketButton.click();
   }
 
   async clickToLogo(): Promise<void> {
-    const logoButton = this.page.locator(searchResultPageLocators.logo).first();
+    const logoButton = this.logo.first();
     await logoButton.click();
   }
 
   async getResultCount(): Promise<number> {
-    const items = this.page.locator(searchResultPageLocators.item);
-    return await items.count();
+    return await this.item.count();
   }
 
   async getNoResultsMessage(): Promise<string> {
-    const locator = this.page.locator(searchResultPageLocators.noResultsMessage);
-    return await locator.textContent() || '';
-  }
-
-  getNoResultsMessageLocator(): Locator {
-    return this.page.locator(searchResultPageLocators.noResultsMessage);
+    return await this.noResultsMessage.textContent() || '';
   }
 
   async isNoResultsMessageVisible(): Promise<boolean> {
-    const noResultsMessage = this.getNoResultsMessageLocator();
-    return await noResultsMessage.isVisible();
+    return await this.noResultsMessage.isVisible();
   }
 
   async verifyNoResultsAndCount(): Promise<{ hasNoResultsMessage: boolean; resultCount: number }> {
@@ -85,7 +96,7 @@ export class SearchResultPage {
   }
 
   async clickToItem(): Promise<void> {
-    const item = this.page.locator(searchResultPageLocators.itemTitle).first();
+    const item = this.itemTitle.first();
     await item.click();
   }
 }

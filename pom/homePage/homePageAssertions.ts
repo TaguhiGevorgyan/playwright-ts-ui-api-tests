@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { testConfig } from '../../config/config';
 import { HomePageLocators } from './homePageLocators';
 
 export class HomePageAssertions {

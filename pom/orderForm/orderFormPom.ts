@@ -2,17 +2,25 @@ import { Page, Locator } from '@playwright/test';
 import { OrderFormLocators } from './orderFormLocators';
 
 export class OrderFormPom {
-    constructor(private readonly page: Page) {}
+    readonly page: Page;
+    readonly nameInput: Locator;
+    readonly phoneInput: Locator;
+    readonly emailInput: Locator;
+    readonly regionSelect: Locator;
+    readonly addressInput: Locator;
+    readonly submitOrderButton: Locator;
+    readonly errorMessages: Locator;
 
-    private form = this.page.locator(OrderFormLocators.orderForm);
-
-    nameInput = this.form.locator(OrderFormLocators.nameField);
-    phoneInput = this.form.locator(OrderFormLocators.phoneField);
-    emailInput = this.form.locator(OrderFormLocators.emailField);
-    regionSelect = this.form.locator(OrderFormLocators.regionSelect);
-    addressInput = this.form.locator(OrderFormLocators.addressField);
-    submitOrderButton = this.form.locator(OrderFormLocators.submitOrderButton);
-    errorMessages = this.form.locator(OrderFormLocators.errorMessages);
+    constructor(page: Page) {
+        this.page = page;
+        this.nameInput = page.locator(OrderFormLocators.nameField);
+        this.phoneInput = page.locator(OrderFormLocators.phoneField);
+        this.emailInput = page.locator(OrderFormLocators.emailField);
+        this.regionSelect = page.locator(OrderFormLocators.regionSelect);
+        this.addressInput = page.locator(OrderFormLocators.addressField);
+        this.submitOrderButton = page.locator(OrderFormLocators.submitOrderButton);
+        this.errorMessages = page.locator(OrderFormLocators.errorMessages);
+    }
 
     async fillContactInfo(name: string, phone: string, email: string) {
         await this.nameInput.fill(name);
@@ -41,25 +49,6 @@ export class OrderFormPom {
         await this.submitOrderButton.click();
     }
 
-    async fillNameField(name: string) {
-        await this.nameInput.fill(name);
-    }
-    
-    async fillPhoneField(phone: string) {
-        await this.phoneInput.fill(phone);
-    }
-    
-    async fillEmailField(email: string) {
-        await this.emailInput.fill(email);
-    }
-    
-    async fillProvinceField(province: string) {
-        await this.chooseRegion(province);
-    }
-
-    async fillAddressField(address: string) {
-        await this.addressInput.fill(address);
-    }
 
     async getFieldValidations() {
         return {

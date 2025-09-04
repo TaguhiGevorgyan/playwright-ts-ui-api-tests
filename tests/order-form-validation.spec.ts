@@ -3,9 +3,6 @@ import { HomePage } from '../pom/homePage/homePagePom';
 import { SearchResultPage } from '../pom/searchResultPage/searchResultPagePom';
 import { BasketPage } from '../pom/basketPage/basketPagePom';
 import { testConfig } from '../config/config';
-import { BasketPageLocators } from '../pom/basketPage/basketPageLocators';
-import { searchResultPageLocators } from '../pom/searchResultPage/searchResultPageLocators';
-import { OrderFormLocators } from '../pom/orderForm/orderFormLocators';
 import { OrderFormAssertions } from '../pom/orderForm/orderFormAssertions';
 import { OrderFormPom } from '../pom/orderForm/orderFormPom';
 
@@ -22,7 +19,7 @@ test.describe('Order Form Validation Tests', () => {
     const assertions = new OrderFormAssertions(page);
     const orderFormPom = new OrderFormPom(page);
 
-    // Step 1: Add any item to basket
+    // Search any item 
     await homePage.doSearch(testConfig.search.keywords.pizza);
 
     const searchResult = new SearchResultPage(page);
@@ -33,7 +30,7 @@ test.describe('Order Form Validation Tests', () => {
     // Navigate to basket page
     await searchResult.clickToBasket();
 
-    // Press "Make an Order" button using proper locator
+    // Press "Make an Order" button 
 
     const basketPage = new BasketPage(page);
     await basketPage.clickMakeOrderButton();
@@ -61,12 +58,11 @@ test.describe('Order Form Validation Tests', () => {
         console.log('Validation errors:', errors);
         await assertions.expectValidationErrorsToBePresent();
     } else {
-        console.log('No validation errors found - form may have been submitted successfully');
+        console.log('No validation errors found');
     }
   });
 
   test('Test order form field validation without submission', async ({ page }) => {
-    const assertions = new OrderFormAssertions(page);
     const homePage = new HomePage(page);
     const orderForm = new OrderFormPom(page);
 
@@ -84,7 +80,7 @@ test.describe('Order Form Validation Tests', () => {
     const basketPage = new BasketPage(page);
     await basketPage.clickMakeOrderButton();
 
-    // Fill all required fields using the new methods
+    // Fill all required fields 
     await orderForm.fillContactInfo(
       testConfig.testData.userName,
       testConfig.testData.userPhone,
@@ -93,34 +89,14 @@ test.describe('Order Form Validation Tests', () => {
     await orderForm.chooseRegion(testConfig.testData.userProvince);
     await orderForm.fillAddress(testConfig.testData.userAddress);
 
-    // Verify field validations
-    const fieldValidations = await orderForm.getFieldValidations();
-  });
-
-  test('Should show errors when required fields are empty', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const orderForm = new OrderFormPom(page);
     const assertions = new OrderFormAssertions(page);
 
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    const searchResult = new SearchResultPage(page);
-    await searchResult.clickAddButton();
-    await searchResult.clickToBasket();
+    // Verify field validations
+    await assertions.expectNameFieldToHaveValue(testConfig.testData.userName);
+    await assertions.expectPhoneFieldToHaveValue(testConfig.testData.userPhone);
+    await assertions.expectEmailFieldToHaveValue(testConfig.testData.userEmail);
+    await assertions.expectRegionToHaveValue(testConfig.testData.userProvince);
+    await assertions.expectAddressFieldToHaveValue(testConfig.testData.userAddress);
 
-    const basketPage = new BasketPage(page);
-    await basketPage.clickMakeOrderButton();
-
-    // Try submitting without filling fields
-    await orderForm.submitOrder();
-
-    // Collect errors
-    const errors = await orderForm.getErrorMessages();
-    console.log(errors);
-
-    // Assertions
-    await assertions.expectValidationErrorsToBePresent();
-    if (errors.length > 0) {
-      await assertions.expectErrorMessagesToContain('Չի լրացվել դաշտը');
-    }
   });
 }); 

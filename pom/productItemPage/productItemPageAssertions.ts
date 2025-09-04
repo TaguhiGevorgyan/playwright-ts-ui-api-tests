@@ -1,5 +1,4 @@
 import { expect, Locator, Page } from '@playwright/test';
-import { testConfig } from '../../config/config';
 import { productItemPageLocators } from './productItemPageLocators';
 
 export class ProductItemPageAssertions {
@@ -79,8 +78,6 @@ export class ProductItemPageAssertions {
     const favoriteSuccessMessage = this.page.locator(productItemPageLocators.favoriteSuccessMessage);
     await expect(favoriteSuccessMessage).toBeVisible();
   }
-
-  // expect item title is the same as in the basket
   async expectItemTitleToBeTheSameAsInBasket(basketItemTitle: string) {
     const productTitle = await this.productItemTitle.textContent();
     expect(productTitle?.trim()).toBe(basketItemTitle.trim());

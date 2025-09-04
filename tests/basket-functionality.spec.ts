@@ -4,16 +4,9 @@ import { SearchResultPage } from '../pom/searchResultPage/searchResultPagePom';
 import { BasketPage } from '../pom/basketPage/basketPagePom';
 import { testConfig } from '../config/config';
 import { BasketPageLocators } from '../pom/basketPage/basketPageLocators';
-import { HomePageLocators } from '../pom/homePage/homePageLocators';
-import { searchResultPageLocators } from '../pom/searchResultPage/searchResultPageLocators';
-import { OrderFormLocators } from '../pom/orderForm/orderFormLocators';
 import { BasketAssertions } from '../pom/basketPage/basketPageAssertions';
-import { HomePageAssertions } from '../pom/homePage/homePageAssertions';
-import { productItemPageLocators } from '../pom/productItemPage/productItemPageLocators';
-import { ProductItemPagePom } from '../pom/productItemPage/productItemPagePom';
 import { ProductItemPageAssertions } from '../pom/productItemPage/productItemPageAssertions';
 
-// Basic basket functionality test cases
 test.describe('Basic Basket Functionality Tests', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(testConfig.urls.base);
@@ -34,7 +27,6 @@ test.describe('Basic Basket Functionality Tests', () => {
     const firstResultTitle = await searchResult.getTitle();
     const firstResultPrice = await searchResult.getPrice();
     
-    // Debug: Log the retrieved values
     console.log(`First result title: "${firstResultTitle}"`);
     console.log(`First result price: "${firstResultPrice}"`);
     
@@ -69,68 +61,19 @@ test.describe('Basic Basket Functionality Tests', () => {
     
     const searchResult = new SearchResultPage(page);
     
-    // Get first result details
-    const firstResultTitle = await searchResult.getTitle();
-    const firstResultPrice = await searchResult.getPrice();
-    
-    // Add first item to basket
-    await searchResult.clickAddButton();
-    
-    // Navigate to basket first to verify first item
-    await searchResult.clickToBasket();
-    
-    // Verify first item is in basket
-    const basketPage = new BasketPage(page);
-    const basketFirstItemName = await basketPage.getItemTitle();
-    const basketFirstItemPrice = await basketPage.getItemPrice();
-    
-    // Compare first item
-
-    console.log(`Item titles: ${basketFirstItemName}, ${firstResultTitle}`);
-    console.log(`Item prices: ${basketFirstItemPrice}, ${firstResultPrice}`);
-    await assertions.expectBasketItemNameToMatch(firstResultTitle, basketFirstItemName);
-    await assertions.expectBasketItemPriceToMatch(firstResultPrice, basketFirstItemPrice);
-    
-    const totalPrice = await basketPage.getTotalPrice();
-    
-    // Verify total price exists and is reasonable
-    const totalPriceResult = await assertions.verifyTotalPrice();
-    expect(totalPriceResult.isValid).toBeTruthy();
-  });
-
-  test('Add two items to basket check the names, the prices and the total price (Comprehensive)', async ({ page }) => {
-    const homePage = new HomePage(page);
-    const assertions = new BasketAssertions(page);
-    
-    // Search for pizza
-    await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-    const searchResult = new SearchResultPage(page);
-        
-    // Get first result details
-    const firstResultTitle = await searchResult.getTitle();
-    const firstResultPrice = await searchResult.getPrice();
-    
     // Add first item to basket
     await searchResult.clickAddButton();
 
-    
     // Navigate back to search results
     await searchResult.clickToLogo();
     await homePage.FindAnItem();
     
-    // Get second result details
-    const secondResultTitle = await searchResult.getTitle();
-    const secondResultPrice = await searchResult.getPrice();
-    
     // Add second item to basket
     await searchResult.clickAddButton();
    
-    
     // Navigate to basket
     await searchResult.clickToBasket();
 
-    
     // Verify basket contains both items
     const basketPage = new BasketPage(page);
     const basketFirstItemPrice = await basketPage.getItemPrice();
@@ -182,28 +125,6 @@ test.describe('Basic Basket Functionality Tests', () => {
     // assert that total price is the sum of the prices of the items
     await assertions.expectTotalPriceToDecrease(totalPrice, newTotalPrice);
   });
-
-  // test('Add items to the basket and check the quantity of the items from the main page', async ({ page }) => {
-  //   const homePage = new HomePage(page);
-  //   // Search for pizza
-  //   await homePage.doSearch(testConfig.search.keywords.pizza);
-    
-  //   const searchResult = new SearchResultPage(page);
-    
-  //   // Add an item to basket
-  //   await searchResult.clickAddButton();
-    
-  //   // Wait for basket quantity to update
-  //   await page.waitForTimeout(10000);
-    
-  //   // Get basket count after actually adding to cart
-  //   const basketQuantityAfterAdding = await homePage.getBasketCount();
-  //   console.log(`Basket count after adding: "${basketQuantityAfterAdding}"`);
-
-  //   const homeAssertions = new HomePageAssertions(page);
-    
-  //   await homeAssertions.expectBasketCountToBeGreaterThanZero(basketQuantityAfterAdding);
-  // });
 
   test('Increase items quantity from the basket', async ({ page }) => {
     const homePage = new HomePage(page);

@@ -25,8 +25,16 @@ export class BasketPage {
 
     async getBasketItemTitle(): Promise<string> {
         // Wait for basket page to load
-        await this.page.waitForTimeout, { timeout: 2000 };
+        await this.page.waitForTimeout(2000);
         return await this.basketItemTitle.textContent() || '';
+    }
+
+    async getItemTitle(): Promise<string> {
+        return await this.basketItemTitle.textContent() || '';
+    }
+
+    async getItemPrice(): Promise<string> {
+        return await this.basketItemPrice.first().textContent() || '';
     }
 
     async getBasketItemPrice(): Promise<string> {
@@ -47,20 +55,6 @@ export class BasketPage {
     async getBasketEmptyMessage(): Promise<string> {
         return await this.basketEmptyMessage.textContent() || '';
     }
-
-    // Alias methods for compatibility with tests
-    async getItemTitle(): Promise<string> {
-        return await this.getBasketItemTitle();
-    }
-
-    async getItemPrice(): Promise<string> {
-        return await this.getBasketItemPrice();
-    }
-
-    async getItemQuantity(): Promise<string> {
-        return await this.getBasketItemQuantity();
-    }
-
    
     async getSecondItemTitle(): Promise<string> {
         const secondItemTitle = this.basketItemTitle.nth(1);
